@@ -60,6 +60,7 @@
   "profile": "प्रोफाइल",
   "ok": "ठीक है",
   "skip": "छोड़ें",
+  "changeLanguage": "भाषा बदलें",
   "errorGettingLocation": "जगह ढूंढने में गलती: {message}",
   "errorFetchingWeather": "मौसम जानने में गलती",
   "errorGettingAddress": "पता ढूंढने में गलती: {message}",

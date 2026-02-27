@@ -193,6 +193,9 @@ class AppLocalizationsMr extends AppLocalizations {
   String get skip => 'वगळा';
 
   @override
+  String get changeLanguage => 'भाषा बदला';
+
+  @override
   String errorGettingLocation(Object message) {
     return 'स्थान मिळवण्यात चूक: $message';
   }

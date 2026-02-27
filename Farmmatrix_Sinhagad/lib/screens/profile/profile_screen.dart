@@ -1,3 +1,4 @@
+import 'package:farmmatrix/screens/profile/change_language_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:farmmatrix/config/app_config.dart';
 import 'package:farmmatrix/models/user_model.dart';
@@ -25,6 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final UserService _userService = UserService();
   int _selectedIndex = 2;
   bool _isLoading = true;
+  FieldInfoModel? _selectedField;
 
   @override
   void initState() {
@@ -99,19 +101,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<FieldInfoModel?> _loadSelectedField() async {
+ Future<void> _loadSelectedField() async {
     final prefs = await SharedPreferences.getInstance();
     final fieldJson = prefs.getString('selectedField');
     if (fieldJson != null) {
       try {
         final fieldMap = jsonDecode(fieldJson) as Map<String, dynamic>;
-        return FieldInfoModel.fromMap(fieldMap);
+        setState(() {
+          _selectedField = FieldInfoModel.fromMap(fieldMap);
+        });
       } catch (e) {
-        print(AppLocalizations.of(context)!.errorDecodingField(e.toString()));
-        return null;
+        print('Error decoding saved field: $e');
       }
     }
-    return null;
+  }
+
+  void _onItemTapped(int index) {
+    if (_selectedIndex == index) return;
+
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+        break;
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => DashboardScreen(selectedField: _selectedField),
+          ),
+        );
+        break;
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ProfileScreen()),
+        );
+        break;
+    }
   }
 
   @override
@@ -148,7 +182,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               AppLocalizations.of(context)!.account,
               style: TextStyle(
                 fontFamily: AppConfig.fontFamily,
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 foreground:
                     Paint()
@@ -272,6 +306,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ChangeLanguageScreen(),
+                ),
+              );
+            },
+            child: _buildRoundedRectangle(
+              AppLocalizations.of(context)!.changeLanguage,
+              Icons.language,
+            ),
+          ),
+          GestureDetector(
             onTap: _handleLogout,
             child: _buildRoundedRectangle(
               AppLocalizations.of(context)!.logout,
@@ -299,53 +347,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home),
-            label: AppLocalizations.of(context)!.home,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.dashboard),
-            label: AppLocalizations.of(context)!.dashboard,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.person),
-            label: AppLocalizations.of(context)!.profile,
-          ),
-        ],
-        onTap: (index) async {
-          setState(() {
-            _selectedIndex = index;
-          });
-
-          if (index == 0) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-            );
-          } else if (index == 1) {
-            final selectedField = await _loadSelectedField();
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder:
-                    (context) => DashboardScreen(selectedField: selectedField),
-              ),
-            );
-          }
-        },
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        selectedItemColor: const Color(0xFF5FA748),
-        unselectedItemColor: const Color(0xFF757575),
-        elevation: 8,
-        iconSize: 24,
-        selectedLabelStyle: TextStyle(fontFamily: AppConfig.fontFamily),
-        unselectedLabelStyle: TextStyle(fontFamily: AppConfig.fontFamily),
+      bottomNavigationBar: _CustomBottomBar(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
     );
   }
@@ -388,6 +392,99 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Icon(
             Icons.arrow_forward,
             color: AppConfig.primaryColor, // Changed to primary color
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CustomBottomBar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onItemTapped;
+
+  const _CustomBottomBar({
+    required this.selectedIndex,
+    required this.onItemTapped,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
+    return Container(
+      height: 80,
+      margin: const EdgeInsets.only(left: 20, right: 20, bottom: 15),
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color(0xFF1B413C),
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                    onPressed: () => onItemTapped(0),
+                    icon: Icon(
+                      Icons.home_outlined,
+                      color: selectedIndex == 0 ? Colors.white : Colors.white70,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 60),
+                  IconButton(
+                    onPressed: () => onItemTapped(2),
+                    icon: Icon(
+                      Icons.person_outline,
+                      color: selectedIndex == 2 ? Colors.white : Colors.white70,
+                      size: 28,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            top: -15,
+            child: GestureDetector(
+              onTap: () => onItemTapped(1),
+              child: Container(
+                width: 90,
+                height: 90,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFD358),
+                  shape: BoxShape.circle,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.dashboard_outlined,
+                      size: 30,
+                      color: Colors.black87,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      loc.dashboard,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),

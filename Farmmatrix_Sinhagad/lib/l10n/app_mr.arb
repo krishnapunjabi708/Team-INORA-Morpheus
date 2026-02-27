@@ -61,6 +61,7 @@
   "profile": "प्रोफाइल",
   "ok": "ठीक",
   "skip": "वगळा",
+  "changeLanguage": "भाषा बदला",
   "errorGettingLocation": "स्थान मिळवण्यात चूक: {message}",
   "errorFetchingWeather": "हवामान मिळवण्यात चूक",
   "errorGettingAddress": "पत्ता मिळवण्यात चूक: {message}",

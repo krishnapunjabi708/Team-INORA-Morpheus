@@ -112,21 +112,24 @@ class _SoilReportScreenState extends State<SoilReportScreen> {
   }
 
   String _getApiUrl() {
-    switch (selectedLanguage) {
-      case 'hindi':
-        return "SOIL_REPORT_HINDI_API";
-      case 'marathi':
-        return "SOIL_REPORT_MARATHI_API";
-      case 'tamil':
-        return "SOIL_REPORT_TAMIL_API";
-      case 'punjabi':
-        return "SOIL_REPORT_PUNJABI_API";
-      case 'telugu':
-        return "SOIL_REPORT_TELUGU_API";
-      default:
-        return "SOIL_REPORT_ENGLISH_API";
-    }
+  final map = {
+    'english': 'SOIL_REPORT_ENGLISH_API',
+    'hindi': 'SOIL_REPORT_HINDI_API',
+    'marathi': 'SOIL_REPORT_MARATHI_API',
+    'tamil': 'SOIL_REPORT_TAMIL_API',
+    'punjabi': 'SOIL_REPORT_PUNJABI_API',
+    'telugu': 'SOIL_REPORT_TELUGU_API',
+  };
+
+  final key = map[selectedLanguage] ?? 'SOIL_REPORT_ENGLISH_API';
+  final url = dotenv.env[key];
+
+  if (url == null) {
+    throw Exception("$key missing in .env");
   }
+
+  return url;
+}
 
   Future<void> _generateSoilReport() async {
     if (!mounted) return;
