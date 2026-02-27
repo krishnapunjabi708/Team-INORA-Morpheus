@@ -160,6 +160,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get viewMap => 'मानचित्र देखें';
 
   @override
+  String get dashboardLabel => 'डैशबोर्ड';
+
+  @override
   String get profile => 'प्रोफाइल';
 
   @override

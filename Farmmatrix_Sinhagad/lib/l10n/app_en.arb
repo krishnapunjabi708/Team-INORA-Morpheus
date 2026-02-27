@@ -49,6 +49,7 @@
   "fertilityMappingTitle": "Fertility Mapping",
   "fertilityMappingDescription": "Get zone-wise fertility map on your selected field",
   "viewMap": "View Map",
+  "dashboardLabel": "Dashboard",
   "profile": "Profile",
   "ok": "OK",
   "errorGettingLocation": "Error getting location: {message}",

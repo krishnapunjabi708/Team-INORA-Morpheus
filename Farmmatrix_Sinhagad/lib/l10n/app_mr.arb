@@ -50,6 +50,7 @@
   "fertilityMappingDescription": "आपल्या निवडलेल्या शेतावर विभागनिहाय सुपीकता नकाशा मिळवा",
   "languageLabel": "भाषा:",
   "viewMap": "नकाशा पहा",
+  "dashboardLabel": "डॅशबोर्ड",
   "profile": "प्रोफाइल",
   "ok": "ठीक",
   "errorGettingLocation": "स्थान मिळवण्यात चूक: {message}",

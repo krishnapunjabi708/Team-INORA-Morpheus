@@ -160,6 +160,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get viewMap => 'View Map';
 
   @override
+  String get dashboardLabel => 'Dashboard';
+
+  @override
   String get profile => 'Profile';
 
   @override

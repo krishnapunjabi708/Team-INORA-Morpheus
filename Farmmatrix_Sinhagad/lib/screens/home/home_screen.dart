@@ -485,37 +485,129 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
       ),),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home),
-            label: AppLocalizations.of(context)!.home,
+      floatingActionButton: FloatingActionButton(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        highlightElevation: 0,
+        onPressed: () {
+          
+        },
+        child: Transform.scale(
+          scale: 1.5,
+          child: Image.asset(
+            'assets/images/chatbot.png',
+            width: 60,
+            height: 60,
           ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.dashboard),
-            label: AppLocalizations.of(context)!.dashboard,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.person),
-            label: AppLocalizations.of(context)!.profile,
-          ),
-        ],
-        onTap: _onItemTapped,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        selectedItemColor: AppConfig.primaryColor,
-        unselectedItemColor: const Color(0xFF757575),
-        elevation: 8,
-        iconSize: 24,
-        selectedLabelStyle: const TextStyle(fontFamily: AppConfig.fontFamily),
-        unselectedLabelStyle: const TextStyle(fontFamily: AppConfig.fontFamily),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+
+      bottomNavigationBar: _CustomBottomBar(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
     );
   }
 }
+
+class _CustomBottomBar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onItemTapped;
+
+  const _CustomBottomBar({
+    required this.selectedIndex,
+    required this.onItemTapped,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 80,
+      margin: const EdgeInsets.only(left: 20, right: 20, bottom: 15),
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          // Green rounded bar
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color(0xFF1B413C),
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  // Home
+                  IconButton(
+                    onPressed: () => onItemTapped(0),
+                    icon: Icon(
+                      Icons.home_outlined,
+                      color: selectedIndex == 0 ? Colors.white : Colors.white70,
+                      size: 28,
+                    ),
+                  ),
+
+                  const SizedBox(width: 60), // space for center button
+                  // Profile
+                  IconButton(
+                    onPressed: () => onItemTapped(2),
+                    icon: Icon(
+                      Icons.person_outline,
+                      color: selectedIndex == 2 ? Colors.white : Colors.white70,
+                      size: 28,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Center Yellow Dashboard Button
+          Positioned(
+            top: -15,
+            child: GestureDetector(
+              onTap: () => onItemTapped(1),
+              child: Container(
+                width: 90,
+                height: 90,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFD358),
+                  shape: BoxShape.circle,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.dashboard_outlined,
+                      size: 30,
+                      color: Colors.black87,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      AppLocalizations.of(context)!.dashboardLabel,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 
 class _FieldActionButton extends StatelessWidget {
   final String label;

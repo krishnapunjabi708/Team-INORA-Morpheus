@@ -391,6 +391,12 @@ abstract class AppLocalizations {
   /// **'View Map'**
   String get viewMap;
 
+  /// No description provided for @dashboardLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get dashboardLabel;
+
   /// No description provided for @profile.
   ///
   /// In en, this message translates to:
