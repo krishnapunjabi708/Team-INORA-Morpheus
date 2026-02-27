@@ -2,30 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart'
-    show
-        BitmapDescriptor,
-        CameraPosition,
-        CameraUpdate,
-        GoogleMap,
-        GoogleMapController,
-        LatLng,
-        LatLngBounds,
-        MapType,
-        Marker,
-        MarkerId,
-        Polygon,
-        PolygonId,
-        Tile,
-        TileOverlay,
-        TileOverlayId,
-        TileProvider;
 import 'package:http/http.dart' as http;
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:farmmatrix/models/field_info_model.dart';
 import 'package:farmmatrix/services/field_services.dart';
-import 'package:farmmatrix/screens/home/home_screen.dart';
 import 'package:farmmatrix/l10n/app_localizations.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -41,150 +21,114 @@ class SatelliteMappingScreen extends StatefulWidget {
 class _SatelliteMappingScreenState extends State<SatelliteMappingScreen> {
   final FieldService _fieldService = FieldService();
   GoogleMapController? _mapController;
+
   LatLng? _currentLocation;
-  Set<Marker> _markers = {};
   Set<Polygon> _polygons = {};
   String? _tileUrlTemplate;
-  String? _startDate;
-  String? _endDate;
+  TileOverlayId? _currentOverlayId;
+
   bool _isLoading = true;
   String? _error;
   LatLngBounds? _fieldBounds;
 
-  static const LatLng _fallbackCenter = LatLng(18.5204, 73.8567); // Pune, India
+  List<List<double>> _apiCoords = [];
+
+  String _selectedParameter = "Fertility Index (Default)";
+  bool _showFilters = false;
+
+  late AppLocalizations loc;
+
+  final List<String> _parameters = [
+    "Fertility Index (Default)",
+    "Nitrogen (N)",
+    "Phosphorus (P)",
+    "Potassium (K)",
+    "Organic Carbon (OC)",
+    "Electrical Conductivity (EC)",
+    "Calcium (Ca)",
+    "Magnesium (Mg)",
+    "Sulphur (S)",
+    "Soil pH",
+  ];
 
   @override
   void initState() {
     super.initState();
-    _initializeMap();
+    _getCurrentLocation();
   }
 
-  Future<void> _initializeMap() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Get current location
+  Future<void> _getCurrentLocation() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        setState(() {
-          _error = AppLocalizations.of(context)!.locationServicesDisabled;
-          _isLoading = false;
-        });
-        return;
+        throw Exception(loc.locationServicesDisabled);
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          setState(() {
-            _error = AppLocalizations.of(context)!.locationPermissionsDenied;
-            _isLoading = false;
-          });
-          return;
+          throw Exception(loc.locationPermissionsDenied);
         }
       }
 
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
+
       setState(() {
         _currentLocation = LatLng(position.latitude, position.longitude);
-        debugPrint(
-          'Current location: ${position.latitude}, ${position.longitude}',
-        );
       });
+
+      await _loadFieldAndMapping();
     } catch (e) {
       setState(() {
-        _error = AppLocalizations.of(
-          context,
-        )!.errorGettingLocation(e.toString());
+        _error = e.toString();
         _isLoading = false;
       });
-      return;
     }
-
-    // Fetch field data and API data
-    await _loadFieldAndFertilityData();
   }
 
-  Future<void> _loadFieldAndFertilityData() async {
+  Future<void> _loadFieldAndMapping() async {
+    loc = AppLocalizations.of(context)!;
+
     try {
-      // Fetch field data from Supabase
       final fieldInfo = await _fieldService.getFieldData(widget.fieldId);
+
       if (fieldInfo == null || fieldInfo.geometry == null) {
-        throw Exception(AppLocalizations.of(context)!.fieldDataMissing);
+        throw Exception(loc.fieldMissing);
       }
 
-      // Log raw geometry
-      debugPrint('Raw geometry: ${jsonEncode(fieldInfo.geometry)}');
+      final coordinates = fieldInfo.geometry!['coordinates'][0];
 
-      // Extract coordinates from GeoJSON
-      final coordinates = fieldInfo.geometry!['coordinates'];
-      if (coordinates is! List ||
-          coordinates.isEmpty ||
-          coordinates[0] is! List) {
-        throw Exception(AppLocalizations.of(context)!.invalidGeometry);
-      }
-      final coordsList = List<List<dynamic>>.from(coordinates[0]);
-
-      // Log coordinates
-      debugPrint('Parsed coordinates: $coordsList');
-
-      final apiCoords = <List<double>>[];
       final points = <LatLng>[];
+
       double minLat = double.infinity, maxLat = -double.infinity;
       double minLng = double.infinity, maxLng = -double.infinity;
 
-      for (var item in coordsList) {
-        if (item.length < 2) continue;
-        final lat = (item[0] as num?)?.toDouble(); // Assume first is latitude
-        final lng = (item[1] as num?)?.toDouble(); // Assume second is longitude
-        if (lat == null || lng == null) continue;
+      _apiCoords.clear();
 
-        // API expects [longitude, latitude]
-        apiCoords.add([lng, lat]);
-        // Google Maps expects LatLng(latitude, longitude)
+      for (var item in coordinates) {
+        final lat = (item[0] as num).toDouble();
+        final lng = (item[1] as num).toDouble();
+
         points.add(LatLng(lat, lng));
+        _apiCoords.add([lng, lat]);
 
-        // Update bounds
         minLat = lat < minLat ? lat : minLat;
         maxLat = lat > maxLat ? lat : maxLat;
         minLng = lng < minLng ? lng : minLng;
         maxLng = lng > maxLng ? lng : maxLng;
       }
 
-      // Log plotted points
-      debugPrint(
-        'Plotted points: ${points.map((p) => [p.latitude, p.longitude]).toList()}',
-      );
-
-      // Close the polygon if needed
-      if (apiCoords.isNotEmpty && apiCoords.first != apiCoords.last) {
-        apiCoords.add(apiCoords.first);
+      if (_apiCoords.first != _apiCoords.last) {
+        _apiCoords.add(_apiCoords.first);
         points.add(points.first);
       }
 
-      // Create markers
-      final markers = <Marker>{};
-      for (var i = 0; i < points.length; i++) {
-        markers.add(
-          Marker(
-            markerId: MarkerId('point_$i'),
-            position: points[i],
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueAzure,
-            ),
-          ),
-        );
-      }
-
-      // Create polygon
-      final polygons = {
+      _polygons = {
         Polygon(
-          polygonId: const PolygonId('field_polygon'),
+          polygonId: const PolygonId("field"),
           points: points,
           strokeWidth: 2,
           strokeColor: Colors.blue,
@@ -192,230 +136,203 @@ class _SatelliteMappingScreenState extends State<SatelliteMappingScreen> {
         ),
       };
 
-      // Set bounds for zooming
-      final bounds =
-          points.isNotEmpty
-              ? LatLngBounds(
-                southwest: LatLng(minLat, minLng),
-                northeast: LatLng(maxLat, maxLng),
-              )
-              : null;
-
-      // Log bounds
-      if (bounds != null) {
-        debugPrint(
-          'Map bounds: SW(${bounds.southwest.latitude}, ${bounds.southwest.longitude}), NE(${bounds.northeast.latitude}, ${bounds.northeast.longitude})',
-        );
-      }
-
-      setState(() {
-        _markers = markers;
-        _polygons = polygons;
-        _fieldBounds = bounds;
-      });
-
-      // Fetch fertility data from API
-      final baseUrl = dotenv.env['FERTILITY_API_BASE_URL'];
-
-      if (baseUrl == null || baseUrl.isEmpty) {
-        throw Exception("API URL not found");
-      }
-
-      final apiUrl = "$baseUrl/fertility";
-      final payload = {'coordinates': apiCoords};
-
-      // Log API input
-      const encoder = JsonEncoder.withIndent('  ');
-      debugPrint('API Request Payload:\n${encoder.convert(payload)}');
-
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(payload),
+      _fieldBounds = LatLngBounds(
+        southwest: LatLng(minLat, minLng),
+        northeast: LatLng(maxLat, maxLng),
       );
 
-      // Log API output
-      if (response.statusCode == 200) {
-        try {
-          final body = jsonDecode(response.body);
-          debugPrint('API Response (Success):\n${encoder.convert(body)}');
-        } catch (e) {
-          debugPrint('API Response (Success, Raw):\n${response.body}');
-        }
-      } else {
-        debugPrint(
-          'API Response (Error):\nStatus Code: ${response.statusCode}\nBody: ${response.body}',
-        );
-        throw Exception(
-          AppLocalizations.of(
-            context,
-          )!.apiRequestFailed(response.statusCode.toString()),
-        );
-      }
+      await _fetchMapping();
 
-      final body = jsonDecode(response.body) as Map<String, dynamic>;
-      setState(() {
-        _tileUrlTemplate = body['tile_url'] as String?;
-        _startDate = body['start_date'] as String?;
-        _endDate = body['end_date'] as String?;
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
 
-      // Zoom to field bounds
       if (_mapController != null && _fieldBounds != null) {
-        await _mapController!.animateCamera(
+        _mapController!.animateCamera(
           CameraUpdate.newLatLngBounds(_fieldBounds!, 50),
         );
       }
     } catch (e) {
       setState(() {
-        _error = AppLocalizations.of(context)!.errorLoadingData(e.toString());
+        _error = e.toString();
         _isLoading = false;
       });
     }
   }
 
+  Future<void> _fetchMapping() async {
+    final apiUrl = dotenv.env['FERTILITY_MAPPING_API'];
+
+    if (apiUrl == null || apiUrl.isEmpty) {
+      throw Exception("FERTILITY_MAPPING_API not found in .env");
+    }
+
+    final payload = {
+      "coordinates": _apiCoords,
+      "parameter": _selectedParameter,
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception("${loc.apiError} ${response.statusCode}");
+      }
+
+      final body = jsonDecode(response.body);
+
+      setState(() {
+        _tileUrlTemplate = body["tile_url"];
+        _currentOverlayId = TileOverlayId(
+          "overlay_${DateTime.now().millisecondsSinceEpoch}",
+        );
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+      });
+    }
+  }
+
+  Future<void> _reloadWithParameter(String parameter) async {
+    setState(() {
+      _selectedParameter = parameter;
+      _showFilters = false;
+      _isLoading = true;
+      _tileUrlTemplate = null;
+      _currentOverlayId = null;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 200));
+    await _fetchMapping();
+    setState(() => _isLoading = false);
+  }
+
+  void _clearOverlay() {
+    setState(() {
+      _tileUrlTemplate = null;
+      _currentOverlayId = null;
+      _selectedParameter = "Fertility Index (Default)";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    loc = AppLocalizations.of(context)!;
+
     if (_error != null) {
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color(0xFF178D38),
-          title: Text(AppLocalizations.of(context)!.fertilityMapping),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-              );
-            },
-          ),
+          title: Text(loc.fertilityMapping),
+          backgroundColor: const Color(0xFF1B413C),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(AppLocalizations.of(context)!.error(_error!)),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _error = null;
-                    _isLoading = true;
-                  });
-                  _initializeMap();
-                },
-                child: Text(AppLocalizations.of(context)!.retry),
-              ),
-            ],
-          ),
-        ),
+        body: Center(child: Text(_error!)),
       );
+    }
+
+    if (_currentLocation == null) {
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
       appBar: AppBar(
+        title: Text(loc.fertilityMapping),
         backgroundColor: const Color(0xFF1B413C),
-        title: Text(AppLocalizations.of(context)!.fertilityMapping),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
       ),
-      body: Stack(
+      body: Column(
         children: [
-          GoogleMap(
-            mapType: MapType.hybrid,
-            initialCameraPosition: CameraPosition(
-              target: _currentLocation ?? _fallbackCenter,
-              zoom: 15,
+          _buildFilterBar(),
+          Expanded(
+            child: Stack(
+              children: [
+                GoogleMap(
+                  mapType: MapType.hybrid,
+                  initialCameraPosition: CameraPosition(
+                    target: _currentLocation!,
+                    zoom: 15,
+                  ),
+                  myLocationEnabled: true,
+                  polygons: _polygons,
+                  tileOverlays:
+                      (_tileUrlTemplate != null && _currentOverlayId != null)
+                          ? {
+                            TileOverlay(
+                              tileOverlayId: _currentOverlayId!,
+                              tileProvider: FertilityTileProvider(
+                                urlTemplate: _tileUrlTemplate!,
+                              ),
+                              transparency: 0.45,
+                            ),
+                          }
+                          : {},
+                  onMapCreated: (controller) {
+                    _mapController = controller;
+                  },
+                ),
+                if (_isLoading)
+                  const Center(child: CircularProgressIndicator()),
+              ],
             ),
-            polygons: _polygons,
-            markers: _markers,
-            tileOverlays:
-                _tileUrlTemplate != null
-                    ? {
-                      TileOverlay(
-                        tileOverlayId: const TileOverlayId('fertility'),
-                        tileProvider: FertilityTileProvider(
-                          urlTemplate: _tileUrlTemplate!,
-                        ),
-                        transparency: 0.45,
-                      ),
-                    }
-                    : {},
-            onMapCreated: (GoogleMapController controller) {
-              _mapController = controller;
-              if (_fieldBounds != null) {
-                controller.animateCamera(
-                  CameraUpdate.newLatLngBounds(_fieldBounds!, 50),
-                );
-              }
-            },
           ),
-          if (_isLoading)
-            Center(
-              child: Card(
-                color: Colors.black54,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const CircularProgressIndicator(color: Colors.white),
-                      const SizedBox(height: 8),
-                      Text(
-                        AppLocalizations.of(context)!.loadingFertilityMap,
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterBar() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1B413C),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  onPressed: () {
+                    setState(() => _showFilters = !_showFilters);
+                  },
+                  icon: const Icon(Icons.tune, size: 18),
+                  label: Text(
+                    loc.filterByNutrients,
+                    style: const TextStyle(fontSize: 14),
                   ),
                 ),
-              ),
+                const SizedBox(width: 12),
+                if (_tileUrlTemplate != null)
+                  _buildSelectedPill(_selectedParameter),
+              ],
             ),
-          if (!_isLoading && _startDate != null && _endDate != null)
-            Positioned(
-              bottom: 27,
-              left: 16,
-              right: 60,
-              child: Card(
-                color: Colors.white.withOpacity(0.9),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        AppLocalizations.of(
-                          context,
-                        )!.fertilityMapPeriod(_startDate!, _endDate!),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _LegendItem(
-                            color: Colors.red,
-                            label: AppLocalizations.of(context)!.fertilityLow,
-                          ),
-                          _LegendItem(
-                            color: Colors.yellow,
-                            label:
-                                AppLocalizations.of(context)!.fertilityModerate,
-                          ),
-                          _LegendItem(
-                            color: Colors.green,
-                            label: AppLocalizations.of(context)!.fertilityHigh,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+          ),
+          const SizedBox(height: 12),
+          if (_showFilters)
+            SizedBox(
+              height: 36,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: _parameters.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                itemBuilder: (context, index) {
+                  final param = _parameters[index];
+                  return GestureDetector(
+                    onTap: () => _reloadWithParameter(param),
+                    child: _buildFilterPill(param),
+                  );
+                },
               ),
             ),
         ],
@@ -423,32 +340,73 @@ class _SatelliteMappingScreenState extends State<SatelliteMappingScreen> {
     );
   }
 
-  @override
-  void dispose() {
-    _mapController?.dispose();
-    super.dispose();
-  }
-}
-
-class _LegendItem extends StatelessWidget {
-  final Color color;
-  final String label;
-
-  const _LegendItem({required this.color, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 16,
-          height: 16,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 4),
-        Text(label, style: const TextStyle(fontSize: 14)),
-      ],
+  Widget _buildFilterPill(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Text(
+        _getLocalizedParameter(text),
+        style: const TextStyle(fontSize: 14),
+      ),
     );
+  }
+
+  Widget _buildSelectedPill(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFF1B413C)),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          GestureDetector(
+            onTap: _clearOverlay,
+            child: const Icon(Icons.close, size: 16),
+          ),
+          const SizedBox(width: 8),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 180),
+            child: Text(
+              _getLocalizedParameter(text),
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getLocalizedParameter(String param) {
+    switch (param) {
+      case "Fertility Index (Default)":
+        return loc.fertilityIndexDefault;
+      case "Nitrogen (N)":
+        return loc.nitrogenN;
+      case "Phosphorus (P)":
+        return loc.phosphorusP;
+      case "Potassium (K)":
+        return loc.potassiumK;
+      case "Organic Carbon (OC)":
+        return loc.organicCarbonOC;
+      case "Electrical Conductivity (EC)":
+        return loc.electricalConductivityEC;
+      case "Calcium (Ca)":
+        return loc.calciumCa;
+      case "Magnesium (Mg)":
+        return loc.magnesiumMg;
+      case "Sulphur (S)":
+        return loc.sulphurS;
+      case "Soil pH":
+        return loc.soilPh;
+      default:
+        return param;
+    }
   }
 }
 
@@ -460,6 +418,7 @@ class FertilityTileProvider implements TileProvider {
   @override
   Future<Tile> getTile(int x, int y, int? zoom) async {
     final z = zoom ?? 0;
+
     final url = urlTemplate
         .replaceAll('{x}', x.toString())
         .replaceAll('{y}', y.toString())
@@ -467,13 +426,13 @@ class FertilityTileProvider implements TileProvider {
 
     try {
       final response = await http.get(Uri.parse(url));
+
       if (response.statusCode != 200 || response.bodyBytes.isEmpty) {
         return Tile(256, 256, Uint8List(0));
       }
 
       return Tile(256, 256, response.bodyBytes);
-    } catch (e) {
-      debugPrint('Error loading tile: $e');
+    } catch (_) {
       return Tile(256, 256, Uint8List(0));
     }
   }

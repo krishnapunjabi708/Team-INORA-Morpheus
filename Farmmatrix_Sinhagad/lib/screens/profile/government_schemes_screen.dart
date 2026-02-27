@@ -32,7 +32,7 @@ class GovernmentSchemesScreen extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        backgroundColor: const Color(0xFF178D38),
+        backgroundColor: const Color(0xFF1B413C),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),

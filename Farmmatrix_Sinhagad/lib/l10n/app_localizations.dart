@@ -463,6 +463,24 @@ abstract class AppLocalizations {
   /// **'Change Language'**
   String get changeLanguage;
 
+  /// No description provided for @fieldMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Field data missing'**
+  String get fieldMissing;
+
+  /// No description provided for @apiError.
+  ///
+  /// In en, this message translates to:
+  /// **'API error'**
+  String get apiError;
+
+  /// No description provided for @filterByNutrients.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by nutrients'**
+  String get filterByNutrients;
+
   /// No description provided for @errorGettingLocation.
   ///
   /// In en, this message translates to:
@@ -798,6 +816,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No field selected or data unavailable. Please select a field from the Home screen.'**
   String get noFieldSelectedMessage;
+
+  /// No description provided for @fertilityIndexDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertility Index (Default)'**
+  String get fertilityIndexDefault;
+
+  /// No description provided for @nitrogenN.
+  ///
+  /// In en, this message translates to:
+  /// **'Nitrogen (N)'**
+  String get nitrogenN;
+
+  /// No description provided for @phosphorusP.
+  ///
+  /// In en, this message translates to:
+  /// **'Phosphorus (P)'**
+  String get phosphorusP;
+
+  /// No description provided for @potassiumK.
+  ///
+  /// In en, this message translates to:
+  /// **'Potassium (K)'**
+  String get potassiumK;
+
+  /// No description provided for @organicCarbonOC.
+  ///
+  /// In en, this message translates to:
+  /// **'Organic Carbon (OC)'**
+  String get organicCarbonOC;
+
+  /// No description provided for @electricalConductivityEC.
+  ///
+  /// In en, this message translates to:
+  /// **'Electrical Conductivity (EC)'**
+  String get electricalConductivityEC;
+
+  /// No description provided for @calciumCa.
+  ///
+  /// In en, this message translates to:
+  /// **'Calcium (Ca)'**
+  String get calciumCa;
+
+  /// No description provided for @magnesiumMg.
+  ///
+  /// In en, this message translates to:
+  /// **'Magnesium (Mg)'**
+  String get magnesiumMg;
+
+  /// No description provided for @sulphurS.
+  ///
+  /// In en, this message translates to:
+  /// **'Sulphur (S)'**
+  String get sulphurS;
 
   /// No description provided for @soilPh.
   ///

@@ -196,6 +196,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changeLanguage => 'Change Language';
 
   @override
+  String get fieldMissing => 'Field data missing';
+
+  @override
+  String get apiError => 'API error';
+
+  @override
+  String get filterByNutrients => 'Filter by nutrients';
+
+  @override
   String errorGettingLocation(Object message) {
     return 'Error getting location: $message';
   }
@@ -396,6 +405,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noFieldSelectedMessage => 'No field selected or data unavailable. Please select a field from the Home screen.';
+
+  @override
+  String get fertilityIndexDefault => 'Fertility Index (Default)';
+
+  @override
+  String get nitrogenN => 'Nitrogen (N)';
+
+  @override
+  String get phosphorusP => 'Phosphorus (P)';
+
+  @override
+  String get potassiumK => 'Potassium (K)';
+
+  @override
+  String get organicCarbonOC => 'Organic Carbon (OC)';
+
+  @override
+  String get electricalConductivityEC => 'Electrical Conductivity (EC)';
+
+  @override
+  String get calciumCa => 'Calcium (Ca)';
+
+  @override
+  String get magnesiumMg => 'Magnesium (Mg)';
+
+  @override
+  String get sulphurS => 'Sulphur (S)';
 
   @override
   String get soilPh => 'Soil pH';

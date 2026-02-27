@@ -196,6 +196,15 @@ class AppLocalizationsHi extends AppLocalizations {
   String get changeLanguage => 'भाषा बदलें';
 
   @override
+  String get fieldMissing => 'खेत का डेटा उपलब्ध नहीं है';
+
+  @override
+  String get apiError => 'API त्रुटि';
+
+  @override
+  String get filterByNutrients => 'पोषक तत्वों के अनुसार फ़िल्टर करें';
+
+  @override
   String errorGettingLocation(Object message) {
     return 'जगह ढूंढने में गलती: $message';
   }
@@ -396,6 +405,33 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get noFieldSelectedMessage => 'कोई खेत नहीं चुना गया या डेटा नहीं है। कृपया होम स्क्रीन से खेत चुनें।';
+
+  @override
+  String get fertilityIndexDefault => 'उर्वरता सूचकांक (डिफ़ॉल्ट)';
+
+  @override
+  String get nitrogenN => 'नाइट्रोजन (N)';
+
+  @override
+  String get phosphorusP => 'फॉस्फोरस (P)';
+
+  @override
+  String get potassiumK => 'पोटैशियम (K)';
+
+  @override
+  String get organicCarbonOC => 'जैविक कार्बन (OC)';
+
+  @override
+  String get electricalConductivityEC => 'विद्युत चालकता (EC)';
+
+  @override
+  String get calciumCa => 'कैल्शियम (Ca)';
+
+  @override
+  String get magnesiumMg => 'मैग्नीशियम (Mg)';
+
+  @override
+  String get sulphurS => 'सल्फर (S)';
 
   @override
   String get soilPh => 'मिट्टी का पीएच';
