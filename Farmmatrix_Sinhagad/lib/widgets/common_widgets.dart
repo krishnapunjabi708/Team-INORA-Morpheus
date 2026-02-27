@@ -122,85 +122,85 @@ class FarmMatrixLogo extends StatelessWidget {
   }
 }
 
-class LanguageOption extends StatelessWidget {
-  final String language;
-  final String languageCode;
+class SimpleLanguageTile extends StatelessWidget {
+  final String title;
   final bool isSelected;
   final VoidCallback onTap;
-  final Widget? flagWidget;
-  final bool enabled;
 
-  const LanguageOption({
+  const SimpleLanguageTile({
     super.key,
-    required this.language,
-    required this.languageCode,
+    required this.title,
     required this.isSelected,
     required this.onTap,
-    this.flagWidget,
-    this.enabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: enabled ? 1.0 : 0.5,
-      child: GestureDetector(
-        onTap: enabled ? onTap : null,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: isSelected ? AppConfig.primaryColor : Colors.grey.shade300, // Now uses 0xFF1B413C
-              width: isSelected ? 2 : 1,
-            ),
-            borderRadius: BorderRadius.circular(10),
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(
+            horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            )
+          ],
+          border: Border.all(
+            color: isSelected
+                ? AppConfig.primaryColor
+                : Colors.transparent,
+            width: 1.5,
           ),
-          child: Row(
-            children: [
-              // Flag
-              if (flagWidget != null) ...[
-                flagWidget!,
-                const SizedBox(width: 16),
-              ],
+        ),
+        child: Row(
+          children: [
 
-              // Language Name
-              Text(
-                language, // Consider translating this if needed
-                style: TextStyle(
-                  fontFamily: AppConfig.fontFamily, // Now PlusJakartaSans
-                  fontSize: 16,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            /// Radio circle
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected
+                      ? AppConfig.primaryColor
+                      : Colors.grey,
+                  width: 2,
                 ),
               ),
-
-              const Spacer(),
-
-              // Radio Button
-              Container(
-                width: 20,
-                height: 20,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: isSelected ? AppConfig.primaryColor : Colors.grey, // Now uses 0xFF1B413C
-                    width: 2,
-                  ),
-                ),
-                child: isSelected
-                    ? Center(
-                        child: Container(
-                          width: 10,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppConfig.primaryColor, // Now uses 0xFF1B413C
-                          ),
+              child: isSelected
+                  ? Center(
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppConfig.primaryColor,
                         ),
-                      )
-                    : null,
+                      ),
+                    )
+                  : null,
+            ),
+
+            const SizedBox(width: 16),
+
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: isSelected
+                    ? FontWeight.w600
+                    : FontWeight.w400,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

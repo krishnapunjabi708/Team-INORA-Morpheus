@@ -27,6 +27,9 @@ class AppLocalizationsMr extends AppLocalizations {
   String get hindi => 'हिन्दी';
 
   @override
+  String get marathi => 'मराठी';
+
+  @override
   String get farmMatrix => 'फार्ममॅट्रिक्स';
 
   @override

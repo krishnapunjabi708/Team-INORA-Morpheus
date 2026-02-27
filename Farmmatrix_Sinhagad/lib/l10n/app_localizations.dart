@@ -133,6 +133,12 @@ abstract class AppLocalizations {
   /// **'Hindi'**
   String get hindi;
 
+  /// No description provided for @marathi.
+  ///
+  /// In en, this message translates to:
+  /// **'Marathi'**
+  String get marathi;
+
   /// No description provided for @farmMatrix.
   ///
   /// In en, this message translates to:

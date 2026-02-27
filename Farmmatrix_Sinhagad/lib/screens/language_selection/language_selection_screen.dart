@@ -18,100 +18,94 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Logo
-              Center(
-                child: Image.asset('assets/images/logo.png', width: 200, height: 140),
-              ),
-              const SizedBox(height: 32),
-
-              // Language Selection Header
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: AppConfig.accentColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Icon(Icons.language, color: Colors.black87),
-                    const SizedBox(width: 8),
+                    const SizedBox(height: 30),
+
+                    // Logo
+                    Image.asset(
+                      'assets/images/logo.png',
+                      width: 170,
+                    ),
+
+                    const SizedBox(height: 40),
+
+                    // Title
                     Text(
-                      AppLocalizations.of(context)!.selectLanguage,
+                      loc.selectLanguage,
                       style: const TextStyle(
-                        fontFamily: AppConfig.fontFamily,
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: Colors.black87,
                       ),
                     ),
+
+                    const SizedBox(height: 32),
+
+                    // Scrollable list of languages
+                    Column(
+                      children: [
+                        // English
+                        SimpleLanguageTile(
+                          title: loc.english,
+                          isSelected: _selectedLanguage == 'en',
+                          onTap: () => setState(() => _selectedLanguage = 'en'),
+                        ),
+                        const SizedBox(height: 14),
+
+                        // Hindi
+                        SimpleLanguageTile(
+                          title: loc.hindi,
+                          isSelected: _selectedLanguage == 'hi',
+                          onTap: () => setState(() => _selectedLanguage = 'hi'),
+                        ),
+                        const SizedBox(height: 14),
+
+                        // Marathi
+                        SimpleLanguageTile(
+                          title: loc.marathi,
+                          isSelected: _selectedLanguage == 'mr',
+                          onTap: () => setState(() => _selectedLanguage = 'mr'),
+                        ),
+                        const SizedBox(height: 14),
+                      ],
+                    ),
+
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+            ),
 
-              // Language Options
-              LanguageOption(
-                language: "English",
-                languageCode: 'en',
-                isSelected: _selectedLanguage == 'en',
-                onTap: () {
-                  setState(() {
-                    _selectedLanguage = 'en';
-                  });
-                },
-                flagWidget: const CountryFlag(countryCode: 'uk'),
-              ),
-              const SizedBox(height: 12),
-              LanguageOption(
-                language: "हिंदी",
-                languageCode: 'hi',
-                isSelected: _selectedLanguage == 'hi',
-                onTap: () {
-                  setState(() {
-                    _selectedLanguage = 'hi';
-                  });
-                },
-                flagWidget: const CountryFlag(countryCode: 'in'),
-              ),
-              const SizedBox(height: 12),
-              LanguageOption(
-                language: "मराठी",
-                languageCode: 'mr',
-                isSelected: _selectedLanguage == 'mr',
-                onTap: () {
-                  setState(() {
-                    _selectedLanguage = 'mr';
-                  });
-                },
-                flagWidget: const CountryFlag(countryCode: 'in'),
-              ),
-
-              const Spacer(),
-
-              // Next Button
-              PrimaryButton(
-                text: AppLocalizations.of(context)!.next,
+            // Next Button – fixed at bottom
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+              child: PrimaryButton(
+                text: loc.next,
+                width: double.infinity,
+                showArrow: false,
                 onPressed: () {
                   Provider.of<LanguageProvider>(context, listen: false)
                       .setLanguage(_selectedLanguage);
-                  Navigator.push(
+
+                  Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
                   );
                 },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
