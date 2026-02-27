@@ -1,0 +1,25 @@
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.10.3
+
+# Earth Engine
+earthengine-api==1.4.2
+
+# Data & Science
+numpy==1.26.4
+pandas==2.2.3
+scipy==1.14.1
+matplotlib==3.9.4
+
+# Date utilities
+python-dateutil==2.9.0.post0
+
+# AI / LLM
+openai==1.57.4
+
+# Async support
+anyio==4.7.0
+httpx==0.28.1
+
+# Static files
+aiofiles==24.1.0
