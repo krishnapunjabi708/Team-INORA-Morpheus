@@ -24,7 +24,7 @@ class SoilReportScreen extends StatefulWidget {
 
 class _SoilReportScreenState extends State<SoilReportScreen> {
   Uint8List? pdfData;
-  String selectedLanguage = 'english'; // Default to English
+  String selectedLanguage = 'english';
   bool isLoading = true;
   List<List<double>>? polygonCoordinates;
   final FieldService _fieldService = FieldService();
@@ -49,34 +49,18 @@ class _SoilReportScreenState extends State<SoilReportScreen> {
       } else if (fieldData.geometry != null) {
         polygonCoordinates = _parseGeometry(fieldData.geometry);
       } else {
-        // Fallback to required coordinates for testing
-        polygonCoordinates = [
-          [73.9880876, 18.4714251],
-          [73.9886227, 18.4713949],
-          [73.9885851, 18.4708559],
-          [73.9880634, 18.4708365],
-          [73.9880876, 18.4714251],
-        ];
-        if (kDebugMode) {
-          print('Using fallback coordinates due to missing Supabase data');
-        }
+        throw Exception(AppLocalizations.of(context)!.noCoordinatesAvailable);
       }
 
       await _generateSoilReport();
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      if (!mounted) return;
+      setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.failedToLoadReport(e.toString()),
-          ),
+          content: Text(AppLocalizations.of(context)!.error(e.toString())),
         ),
       );
-      if (kDebugMode) {
-        print('Error: $e');
-      }
     }
   }
 
@@ -127,91 +111,86 @@ class _SoilReportScreenState extends State<SoilReportScreen> {
     }
   }
 
+  String _getApiUrl() {
+    switch (selectedLanguage) {
+      case 'hindi':
+        return "SOIL_REPORT_HINDI_API";
+      case 'marathi':
+        return "SOIL_REPORT_MARATHI_API";
+      case 'tamil':
+        return "SOIL_REPORT_TAMIL_API";
+      case 'punjabi':
+        return "SOIL_REPORT_PUNJABI_API";
+      case 'telugu':
+        return "SOIL_REPORT_TELUGU_API";
+      default:
+        return "SOIL_REPORT_ENGLISH_API";
+    }
+  }
+
   Future<void> _generateSoilReport() async {
-    setState(() {
-      isLoading = true;
-    });
+    if (!mounted) return;
+    setState(() => isLoading = true);
 
     try {
       if (polygonCoordinates == null || polygonCoordinates!.isEmpty) {
         throw Exception(AppLocalizations.of(context)!.noCoordinatesAvailable);
       }
 
-      // Validate polygon is closed
+      // Close polygon if needed
       if (polygonCoordinates!.first != polygonCoordinates!.last) {
         polygonCoordinates!.add(polygonCoordinates!.first);
       }
 
+      final double lat = polygonCoordinates![0][1];
+      final double lon = polygonCoordinates![0][0];
+
+      final requestBody = {
+        "lat": lat,
+        "lon": lon,
+        "start_date": "2024-01-01",
+        "end_date": "2024-01-16",
+        "buffer_meters": 200,
+        "polygon_coords": polygonCoordinates,
+        "cec_intercept": 5,
+        "cec_slope_clay": 20,
+        "cec_slope_om": 15,
+      };
+
       if (kDebugMode) {
-        print(
-          'Request payload: ${json.encode({"polygon": polygonCoordinates, "language": selectedLanguage})}',
-        );
+        print("API URL: ${_getApiUrl()}");
+        print("Request Body: ${jsonEncode(requestBody)}");
       }
 
-      // Select API endpoint based on language
-      final apiUrl =
-          selectedLanguage == 'hindi'
-              ? dotenv.env['SOIL_REPORT_HINDI_API']
-              : dotenv.env['SOIL_REPORT_ENGLISH_API'];
-
-      if (apiUrl == null) {
-        throw Exception("API URL not found");
-      }
       final response = await http.post(
-        Uri.parse(apiUrl),
+        Uri.parse(_getApiUrl()),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/pdf',
         },
-        body: json.encode({
-          "polygon": polygonCoordinates,
-          "language": selectedLanguage,
-        }),
+        body: jsonEncode(requestBody),
       );
-
-      if (kDebugMode) {
-        print('API Response Status Code: ${response.statusCode}');
-        print('API Response Headers: ${response.headers}');
-        if (response.bodyBytes.isNotEmpty) {
-          try {
-            final responseBody = utf8.decode(
-              response.bodyBytes,
-              allowMalformed: true,
-            );
-            print('API Response Body (as string): $responseBody');
-          } catch (e) {
-            print(
-              'API Response Body is binary (likely PDF or corrupted): ${response.bodyBytes.length} bytes',
-            );
-          }
-        } else {
-          print('API Response Body: Empty');
-        }
-      }
 
       if (response.statusCode == 200) {
         final directory = await getApplicationDocumentsDirectory();
         final file = File(
           '${directory.path}/soil_report_${widget.fieldId}_$selectedLanguage.pdf',
         );
+
         await file.writeAsBytes(response.bodyBytes);
 
+        if (!mounted) return;
         setState(() {
           pdfData = response.bodyBytes;
           pdfPath = file.path;
           isLoading = false;
         });
       } else {
-        throw Exception(
-          AppLocalizations.of(
-            context,
-          )!.failedToLoadReport(response.statusCode.toString()),
-        );
+        throw Exception("API returned status ${response.statusCode}");
       }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      if (!mounted) return;
+      setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -219,9 +198,6 @@ class _SoilReportScreenState extends State<SoilReportScreen> {
           ),
         ),
       );
-      if (kDebugMode) {
-        print('Error generating report: $e');
-      }
     }
   }
 
@@ -264,10 +240,11 @@ class _SoilReportScreenState extends State<SoilReportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.soilReport),
-        backgroundColor: const Color(0xFF178D38),
+        backgroundColor: const Color(0xFF1B413C),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, size: 28),
           onPressed: () {
@@ -279,93 +256,84 @@ class _SoilReportScreenState extends State<SoilReportScreen> {
         automaticallyImplyLeading: false,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(AppLocalizations.of(context)!.languageLabel),
+                Text(
+                  "${loc.language} ",
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
                 const SizedBox(width: 8),
                 DropdownButton<String>(
                   value: selectedLanguage,
+                  underline: const SizedBox(),
                   items: [
                     DropdownMenuItem(
                       value: 'english',
-                      child: Text(AppLocalizations.of(context)!.english),
+                      child: Text(loc.english),
                     ),
+                    DropdownMenuItem(value: 'hindi', child: Text(loc.hindi)),
                     DropdownMenuItem(
-                      value: 'hindi',
-                      child: Text(AppLocalizations.of(context)!.hindi),
+                      value: 'marathi',
+                      child: Text(loc.marathi),
                     ),
+                    DropdownMenuItem(value: 'tamil', child: Text(loc.tamil)),
+                    DropdownMenuItem(
+                      value: 'punjabi',
+                      child: Text(loc.punjabi),
+                    ),
+                    DropdownMenuItem(value: 'telugu', child: Text(loc.telugu)),
                   ],
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        selectedLanguage = newValue;
-                      });
+                  onChanged: (value) {
+                    // value is guaranteed non-null here
+                    if (value != selectedLanguage) {
+                      setState(() => selectedLanguage = value!);
                       _generateSoilReport();
                     }
                   },
-                  style: const TextStyle(fontSize: 17, color: Colors.black),
-                  dropdownColor: Colors.white,
-                  icon: const Icon(Icons.arrow_drop_down, size: 28),
                 ),
               ],
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
             Expanded(
               child:
                   isLoading
                       ? const Center(child: CircularProgressIndicator())
-                      : pdfData != null && pdfPath != null
-                      ? Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10.0),
-                        child: Transform.scale(
-                          scale: 1.2,
-                          child: PDFView(
-                            filePath: pdfPath!,
-                            enableSwipe: true,
-                            swipeHorizontal: false,
-                            autoSpacing: true,
-                            pageFling: true,
-                            fitPolicy: FitPolicy.WIDTH,
-                            onError: (error) {
-                              if (kDebugMode) {
-                                print('PDFView error: $error');
-                              }
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    AppLocalizations.of(
-                                      context,
-                                    )!.errorLoadingPDF(error.toString()),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
+                      : pdfPath != null
+                      ? PDFView(
+                        filePath: pdfPath!,
+                        fitPolicy: FitPolicy.WIDTH,
+                        enableSwipe: true,
+                        swipeHorizontal: true,
+                        autoSpacing: false,
+                        pageFling: true,
                       )
                       : Center(
                         child: Text(
-                          AppLocalizations.of(context)!.noPDFAvailable,
+                          loc.noPDFAvailable,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
             ),
-            const SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                onPressed: _downloadReport,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF178D38),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 35,
-                    vertical: 10,
-                  ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: pdfPath != null ? _downloadReport : null,
+              icon: const Icon(Icons.download),
+              label: Text(loc.downloadReport),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1B413C),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(AppLocalizations.of(context)!.downloadReport),
               ),
             ),
           ],

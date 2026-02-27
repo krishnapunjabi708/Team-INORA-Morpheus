@@ -30,6 +30,18 @@ class AppLocalizationsHi extends AppLocalizations {
   String get marathi => 'मराठी';
 
   @override
+  String get tamil => 'तमिल';
+
+  @override
+  String get punjabi => 'पंजाबी';
+
+  @override
+  String get telugu => 'तेलुगु';
+
+  @override
+  String get language => 'भाषा:';
+
+  @override
   String get farmMatrix => 'फार्ममैट्रिक्स';
 
   @override
