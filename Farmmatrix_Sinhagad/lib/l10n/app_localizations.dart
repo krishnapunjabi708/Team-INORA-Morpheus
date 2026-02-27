@@ -139,6 +139,30 @@ abstract class AppLocalizations {
   /// **'Marathi'**
   String get marathi;
 
+  /// No description provided for @tamil.
+  ///
+  /// In en, this message translates to:
+  /// **'Tamil'**
+  String get tamil;
+
+  /// No description provided for @punjabi.
+  ///
+  /// In en, this message translates to:
+  /// **'Punjabi'**
+  String get punjabi;
+
+  /// No description provided for @telugu.
+  ///
+  /// In en, this message translates to:
+  /// **'Telugu'**
+  String get telugu;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language:'**
+  String get language;
+
   /// No description provided for @farmMatrix.
   ///
   /// In en, this message translates to:
