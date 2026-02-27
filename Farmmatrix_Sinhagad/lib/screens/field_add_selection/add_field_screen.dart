@@ -220,7 +220,7 @@ class _AddFieldScreenState extends State<AddFieldScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.addNewField),
-        backgroundColor: const Color(0xFF178D38),
+        backgroundColor: const Color(0xFF1B413C),
       ),
       body: _currentLocation == null
           ? const Center(child: CircularProgressIndicator())

@@ -457,6 +457,12 @@ abstract class AppLocalizations {
   /// **'Skip'**
   String get skip;
 
+  /// No description provided for @changeLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Language'**
+  String get changeLanguage;
+
   /// No description provided for @errorGettingLocation.
   ///
   /// In en, this message translates to:

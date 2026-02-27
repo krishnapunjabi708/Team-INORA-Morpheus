@@ -24,17 +24,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String _address = 'Fetching location...';
-  String _greeting = '......';
-  String? _weatherIconUrl;
+  String _address = '';
   int _selectedIndex = 0;
   FieldInfoModel? _selectedField;
   String? _temperature;
-  String? _weatherDescription;
   UserModel? _currentUser;
   bool _isLoadingUser = true;
 
-  // OpenWeatherMap API key
   final String _apiKey = 'bfd90807d20e8b889145cbc80b8015b3';
 
   @override
@@ -51,7 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
       final userId = prefs.getString('userId');
 
       if (userId == null) {
-        print('No user ID found in SharedPreferences');
         setState(() {
           _currentUser = null;
           _isLoadingUser = false;
@@ -59,17 +54,14 @@ class _HomeScreenState extends State<HomeScreen> {
         return;
       }
 
-      print('Fetching user data for ID: $userId');
       final userService = UserService();
       final user = await userService.getUserData(userId);
-      print('Fetched user data: ${user.toMap()}');
 
       setState(() {
         _currentUser = user;
         _isLoadingUser = false;
       });
     } catch (e) {
-      print('Error fetching user data: $e');
       setState(() {
         _currentUser = null;
         _isLoadingUser = false;
@@ -118,21 +110,14 @@ class _HomeScreenState extends State<HomeScreen> {
         return AlertDialog(
           title: Text(
             AppLocalizations.of(context)!.locationServiceDisabledTitle,
-            style: const TextStyle(fontFamily: AppConfig.fontFamily),
           ),
           content: Text(
             AppLocalizations.of(context)!.locationServiceDisabledMessage,
-            style: const TextStyle(fontFamily: AppConfig.fontFamily),
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                AppLocalizations.of(context)!.ok,
-                style: const TextStyle(fontFamily: AppConfig.fontFamily),
-              ),
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(AppLocalizations.of(context)!.ok),
             ),
           ],
         );
@@ -151,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ]);
     } catch (e) {
       setState(() {
-        _address = AppLocalizations.of(context)!.errorGettingLocation(e.toString());
+        _address = 'Error getting location';
       });
     }
   }
@@ -162,16 +147,28 @@ class _HomeScreenState extends State<HomeScreen> {
         position.latitude,
         position.longitude,
       );
+
       if (placemarks.isNotEmpty) {
-        Placemark place = placemarks[0];
+        Placemark place = placemarks.first;
+
+        String city =
+            place.locality ??
+            place.subAdministrativeArea ??
+            place.subLocality ??
+            'Unknown';
+
+        // 🔥 Remove state if accidentally included
+        if (city.contains(',')) {
+          city = city.split(',').first.trim();
+        }
+
         setState(() {
-          _address = '${place.locality}, ${place.administrativeArea}';
-          _greeting = _getGreeting();
+          _address = city;
         });
       }
     } catch (e) {
       setState(() {
-        _address = AppLocalizations.of(context)!.errorGettingAddress(e.toString());
+        _address = 'Unknown';
       });
     }
   }
@@ -181,47 +178,31 @@ class _HomeScreenState extends State<HomeScreen> {
       final url = Uri.parse(
         'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$_apiKey&units=metric',
       );
+
       final response = await http.get(url);
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+
         setState(() {
-          _weatherDescription = _capitalize(data['weather'][0]['description']);
           _temperature = '${data['main']['temp'].round()}°C';
-          _weatherIconUrl =
-              'http://openweathermap.org/img/wn/${data['weather'][0]['icon']}@2x.png';
         });
       } else {
         setState(() {
-          _weatherDescription = AppLocalizations.of(context)!.weatherUnavailable;
           _temperature = '--°C';
         });
       }
     } catch (e) {
       setState(() {
-        _weatherDescription = AppLocalizations.of(context)!.errorLoadingWeather;
         _temperature = '--°C';
       });
     }
   }
 
-  String _capitalize(String text) {
-    if (text.isEmpty) return text;
-    return '${text[0].toUpperCase()}${text.substring(1)}';
-  }
-
-  String _getGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return AppLocalizations.of(context)!.goodMorning;
-    if (hour < 18) return AppLocalizations.of(context)!.goodAfternoon;
-    return AppLocalizations.of(context)!.goodEvening;
-  }
-
   void _onItemTapped(int index) {
     if (_selectedIndex == index) return;
 
-    setState(() {
-      _selectedIndex = index;
-    });
+    setState(() => _selectedIndex = index);
 
     switch (index) {
       case 0:
@@ -230,7 +211,8 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DashboardScreen(selectedField: _selectedField),
+            builder:
+                (context) => DashboardScreen(selectedField: _selectedField),
           ),
         );
         break;
@@ -246,13 +228,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F1F1),
+      backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
         child: SingleChildScrollView(
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
             children: [
+              // Header Image
               Container(
                 height: 210,
                 width: double.infinity,
@@ -263,14 +246,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   alignment: Alignment.center,
                 ),
               ),
-              // Welcome User Name
-              
-               Transform.translate(
+
+              // Overlapping White Welcome Card
+              Transform.translate(
                 offset: const Offset(0, -30),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Container(
-                    padding: const EdgeInsets.fromLTRB(13, 13, 13, 13),
+                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(28),
@@ -421,6 +404,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+
+              // Feature Cards
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
@@ -477,20 +462,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         }
                       },
-                    ),
+                    )
                   ],
                 ),
               ),
-               const SizedBox(height: 80),
+
+              const SizedBox(height: 80), // space for FAB
             ],
           ),
-      ),),
+        ),
+      ),
+
       floatingActionButton: FloatingActionButton(
         elevation: 0,
         backgroundColor: Colors.transparent,
         highlightElevation: 0,
         onPressed: () {
-          
         },
         child: Transform.scale(
           scale: 1.5,
@@ -608,7 +595,7 @@ class _CustomBottomBar extends StatelessWidget {
   }
 }
 
-
+// Reusable Field Action Button
 class _FieldActionButton extends StatelessWidget {
   final String label;
   final Color backgroundColor;
@@ -828,8 +815,3 @@ class FeatureCard extends StatelessWidget {
     );
   }
 }
-
-
-
-
-

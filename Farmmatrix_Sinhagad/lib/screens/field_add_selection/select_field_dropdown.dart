@@ -134,7 +134,7 @@ class _SelectFieldDropdownState extends State<SelectFieldDropdown> {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.selectField),
-        backgroundColor: const Color(0xFF178D38),
+        backgroundColor: const Color(0xFF1B413C),
         elevation: 0,
         iconTheme: const IconThemeData(color: Color.fromARGB(255, 255, 255, 255)),
         actions: [

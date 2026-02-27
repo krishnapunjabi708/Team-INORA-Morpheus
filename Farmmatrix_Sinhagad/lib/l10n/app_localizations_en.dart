@@ -193,6 +193,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get skip => 'Skip';
 
   @override
+  String get changeLanguage => 'Change Language';
+
+  @override
   String errorGettingLocation(Object message) {
     return 'Error getting location: $message';
   }

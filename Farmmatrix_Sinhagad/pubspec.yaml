@@ -65,6 +65,7 @@ flutter:
     - assets/images/logo2.png
     - assets/images/
     - assets/fonts/PlusJakartaSans-VariableFont_wght.ttf
+    - .env
   fonts:
     - family: PlusJakartaSans
       fonts:

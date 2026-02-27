@@ -60,6 +60,7 @@
   "profile": "Profile",
   "ok": "OK",
   "skip": "Skip",
+  "changeLanguage": "Change Language",
   "errorGettingLocation": "Error getting location: {message}",
   "errorFetchingWeather": "Error fetching weather",
   "errorGettingAddress": "Error getting address: {message}",

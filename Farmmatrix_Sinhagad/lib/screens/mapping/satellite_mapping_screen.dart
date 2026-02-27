@@ -315,7 +315,7 @@ class _SatelliteMappingScreenState extends State<SatelliteMappingScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF178D38),
+        backgroundColor: const Color(0xFF1B413C),
         title: Text(AppLocalizations.of(context)!.fertilityMapping),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
