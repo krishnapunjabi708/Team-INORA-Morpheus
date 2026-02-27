@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pydantic
+earthengine-api
+pandas
+matplotlib
+reportlab
+google-generativeai
+python-dateutil
+# Groq / OpenAI-compatible client
+openai==1.51.2
+
+# HTTP
+httpx==0.27.2
