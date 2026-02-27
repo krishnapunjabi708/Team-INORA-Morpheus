@@ -754,7 +754,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get soilHealthHistoryTitle => 'मिट्टी स्वास्थ्य इतिहास';
 
   @override
-  String get soilHealthHistoryDescription => 'समय के साथ मिट्टी स्वास्थ्य का विश्लेषण करें';
+  String get soilHealthHistoryDescription => 'आपकी मिट्टी के मापदंडों के ऐतिहासिक रुझानों का विस्तृत रिकॉर्ड';
 
   @override
   String get viewHistory => 'इतिहास देखें';

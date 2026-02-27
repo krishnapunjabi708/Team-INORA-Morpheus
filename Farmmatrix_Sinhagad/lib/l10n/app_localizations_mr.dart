@@ -754,7 +754,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get soilHealthHistoryTitle => 'माती आरोग्य इतिहास';
 
   @override
-  String get soilHealthHistoryDescription => 'कालावधीतील माती आरोग्य विश्लेषण पहा';
+  String get soilHealthHistoryDescription => 'तुमच्या मातीच्या घटकांच्या ऐतिहासिक प्रवाहांचा सविस्तर नोंदवही';
 
   @override
   String get viewHistory => 'इतिहास पहा';

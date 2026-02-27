@@ -232,7 +232,7 @@
   "deleteChatConfirmation": "तुम्हाला खरंच हा चॅट हटवायचा आहे का? ही कृती परत करता येणार नाही.",
   "apiErrorMessage": "माफ करा, तुमची विनंती पूर्ण करू शकलो नाही. पुन्हा प्रयत्न करा.",
   "soilHealthHistoryTitle": "माती आरोग्य इतिहास",
-"soilHealthHistoryDescription": "कालावधीतील माती आरोग्य विश्लेषण पहा",
+"soilHealthHistoryDescription": "तुमच्या मातीच्या घटकांच्या ऐतिहासिक प्रवाहांचा सविस्तर नोंदवही",
 "viewHistory": "इतिहास पहा",
 "soilHealthHistory": "माती आरोग्य इतिहास",
 "selectedParameter": "निवडलेला पॅरामीटर",

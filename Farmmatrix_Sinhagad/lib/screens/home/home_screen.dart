@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:farmmatrix/screens/chatbot/chatbot_screen.dart';
 import 'package:farmmatrix/screens/health_history/soil_health_history.dart';
 import 'package:farmmatrix/screens/soil_report/soil_report_screen.dart';
 import 'package:flutter/material.dart';
@@ -505,7 +506,12 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         highlightElevation: 0,
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ChatbotScreen()),
+          );
+        },
         child: Transform.scale(
           scale: 1.5,
           child: Image.asset(

@@ -1486,7 +1486,7 @@ abstract class AppLocalizations {
   /// No description provided for @soilHealthHistoryDescription.
   ///
   /// In en, this message translates to:
-  /// **'Track soil health trends over time'**
+  /// **'A track record of historic trends of your soil parameters'**
   String get soilHealthHistoryDescription;
 
   /// No description provided for @viewHistory.

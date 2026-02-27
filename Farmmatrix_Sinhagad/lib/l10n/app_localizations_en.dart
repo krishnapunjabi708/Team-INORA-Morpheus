@@ -754,7 +754,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get soilHealthHistoryTitle => 'Soil Health History';
 
   @override
-  String get soilHealthHistoryDescription => 'Track soil health trends over time';
+  String get soilHealthHistoryDescription => 'A track record of historic trends of your soil parameters';
 
   @override
   String get viewHistory => 'View History';

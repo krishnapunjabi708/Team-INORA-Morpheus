@@ -233,7 +233,7 @@
   "deleteChatConfirmation": "क्या आप सचमुच इस चैट को हटाना चाहते हैं? इसे वापस नहीं लाया जा सकता।",
   "apiErrorMessage": "माफ करें, आपका अनुरोध पूरा नहीं हुआ। फिर से कोशिश करें।",
   "soilHealthHistoryTitle": "मिट्टी स्वास्थ्य इतिहास",
-"soilHealthHistoryDescription": "समय के साथ मिट्टी स्वास्थ्य का विश्लेषण करें",
+"soilHealthHistoryDescription": "आपकी मिट्टी के मापदंडों के ऐतिहासिक रुझानों का विस्तृत रिकॉर्ड",
 "viewHistory": "इतिहास देखें",
 "soilHealthHistory": "मिट्टी स्वास्थ्य इतिहास",
 "selectedParameter": "चयनित पैरामीटर",
