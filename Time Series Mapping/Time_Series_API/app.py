@@ -1,16 +1,13 @@
-"""
-FarmMatrix — Time Series Nutrient Mapping
-Captures every actual Sentinel-2 satellite overpass between selected dates.
-No fixed sampling interval — real visit dates only.
-"""
-
-import logging
 import os
+import json
+import logging
 import warnings
 import math
+import asyncio
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from io import BytesIO
+import base64
 
 import numpy as np
 import pandas as pd
@@ -21,10 +18,13 @@ import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
 from scipy import stats
 
-import streamlit as st
-import folium
-from streamlit_folium import st_folium
-from folium.plugins import Draw
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional, List, Any
+import uvicorn
 import ee
 from openai import OpenAI
 
@@ -34,7 +34,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 # ─────────────────────────────────────────────────────────────────────────────
 #  CONFIG
 # ─────────────────────────────────────────────────────────────────────────────
-GROQ_API_KEY = "grok"
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 GROQ_MODEL   = "llama-3.3-70b-versatile"
 
 IDEAL_RANGES = {
@@ -97,16 +97,30 @@ DOT_C      = {"good": "#43A047", "low": "#FF9800", "high": "#E53935", "na": "#9E
 # ─────────────────────────────────────────────────────────────────────────────
 #  EARTH ENGINE INIT
 # ─────────────────────────────────────────────────────────────────────────────
-try:
-    ee.Initialize()
-except Exception:
-    ee.Authenticate()
-    ee.Initialize()
+def initialize_ee():
+    global ee_initialized
+    try:
+        credentials_base64 = os.getenv("GEE_SERVICE_ACCOUNT_KEY")
+        if not credentials_base64:
+            raise ValueError("❌ Google Earth Engine credentials are missing.")
+        credentials_json_str = base64.b64decode(credentials_base64).decode("utf-8")
+        credentials_dict = json.loads(credentials_json_str)
+        from ee import ServiceAccountCredentials
+        credentials = ServiceAccountCredentials(credentials_dict['client_email'], key_data=credentials_json_str)
+        ee.Initialize(credentials)
+        ee_initialized = True
+        logging.info("✅ Google Earth Engine initialized successfully.")
+    except Exception as e:
+        ee_initialized = False
+        logging.error(f"❌ Google Earth Engine initialization failed: {e}")
+        raise
+
+initialize_ee()
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  SATELLITE — get all actual overpass dates in range
+#  SATELLITE FUNCTIONS
 # ─────────────────────────────────────────────────────────────────────────────
-def get_all_visit_dates(region, start: date, end: date) -> list[date]:
+def get_all_visit_dates(region, start: date, end: date) -> list:
     s = start.strftime("%Y-%m-%d")
     e = end.strftime("%Y-%m-%d")
     try:
@@ -156,7 +170,8 @@ def get_band_stats(comp, region):
         ).getInfo()
         return {k: (float(v) if v is not None else 0.0) for k, v in raw.items()}
     except Exception as exc:
-        logging.error(f"get_band_stats: {exc}"); return {}
+        logging.error(f"get_band_stats: {exc}")
+        return {}
 
 
 def get_lst(region, day: date):
@@ -175,7 +190,8 @@ def get_lst(region, day: date):
         v   = img.reduceRegion(ee.Reducer.mean(), region, 1000, maxPixels=1e13).getInfo().get("lst")
         return float(v) if v is not None else None
     except Exception as exc:
-        logging.error(f"get_lst: {exc}"); return None
+        logging.error(f"get_lst: {exc}")
+        return None
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -211,7 +227,8 @@ def get_cec(comp, region):
         if c_m is None or o_m is None: return None
         return 5.0+20.0*float(c_m)+15.0*float(o_m)
     except Exception as exc:
-        logging.error(f"get_cec: {exc}"); return None
+        logging.error(f"get_cec: {exc}")
+        return None
 
 def get_ndvi(bs):
     b8,b4 = bs.get("B8",0), bs.get("B4",0)
@@ -283,7 +300,7 @@ def health_score(snap: dict) -> float:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  FETCH — one snapshot per actual satellite visit date
+#  FETCH
 # ─────────────────────────────────────────────────────────────────────────────
 def fetch_snapshot(region, day: date) -> dict | None:
     comp = single_day_composite(region, day)
@@ -310,31 +327,10 @@ def fetch_snapshot(region, day: date) -> dict | None:
     }
 
 
-def fetch_all_visits(region, visit_dates: list, pb, status_el) -> pd.DataFrame:
-    records = []
-    total   = len(visit_dates)
-    for i, day in enumerate(visit_dates):
-        status_el.markdown(
-            f"⏳ **Pass {i+1}/{total}** — {day.strftime('%d %b %Y')}  "
-            f"*(Sentinel-2 actual overpass)*"
-        )
-        snap = fetch_snapshot(region, day)
-        row  = {
-            "date": pd.Timestamp(day),
-            **(snap if snap else {p: None for p in IDEAL_RANGES})
-        }
-        records.append(row)
-        pb.progress((i + 1) / total)
-
-    df = pd.DataFrame(records)
-    df["date"] = pd.to_datetime(df["date"])
-    return df.sort_values("date").reset_index(drop=True)
-
-
 # ─────────────────────────────────────────────────────────────────────────────
 #  CHARTS
 # ─────────────────────────────────────────────────────────────────────────────
-def chart_health_score(df: pd.DataFrame) -> BytesIO | None:
+def chart_health_score(df: pd.DataFrame) -> str | None:
     clean = df[df["date"].notna()].copy()
     if clean.empty: return None
 
@@ -389,10 +385,10 @@ def chart_health_score(df: pd.DataFrame) -> BytesIO | None:
     fig.savefig(buf, format="png", dpi=130, bbox_inches="tight")
     plt.close(fig)
     buf.seek(0)
-    return buf
+    return base64.b64encode(buf.read()).decode("utf-8")
 
 
-def chart_single_param(df: pd.DataFrame, param: str) -> BytesIO | None:
+def chart_single_param(df: pd.DataFrame, param: str) -> str | None:
     if param not in df.columns: return None
 
     tmp = df[df["date"].notna()].copy()
@@ -436,8 +432,7 @@ def chart_single_param(df: pd.DataFrame, param: str) -> BytesIO | None:
     arrow = "↑" if pct > 1 else ("↓" if pct < -1 else "→")
     direction = "Increasing" if pct > 1 else ("Decreasing" if pct < -1 else "Stable")
 
-    ax.set_title(f"{FULL_NAME.get(param, param)}",
-                 fontsize=11, fontweight="bold", pad=10)
+    ax.set_title(f"{FULL_NAME.get(param, param)}", fontsize=11, fontweight="bold", pad=10)
     ax.set_xlabel(f"Trend: {arrow} {direction}  ({pct:+.1f}% over period)  ·  "
                   f"Each point = one Sentinel-2 satellite pass",
                   fontsize=8.5, labelpad=6, color="#555")
@@ -460,31 +455,28 @@ def chart_single_param(df: pd.DataFrame, param: str) -> BytesIO | None:
     fig.savefig(buf, format="png", dpi=130, bbox_inches="tight")
     plt.close(fig)
     buf.seek(0)
-    return buf
+    return base64.b64encode(buf.read()).decode("utf-8")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  AI — FOCUSED on selected parameter only
+#  AI ADVISORY
 # ─────────────────────────────────────────────────────────────────────────────
 SYSTEM_PROMPT = """
 You are Dr. Arjun Patil, a Senior Soil Scientist and Precision Agriculture Specialist
 with 30 years of field experience working with smallholder farmers across India
 (Maharashtra, Punjab, Karnataka, Andhra Pradesh, Tamil Nadu).
-
 You combine deep knowledge of:
 • Soil chemistry and ICAR soil health standards
 • Satellite remote sensing (Sentinel-2, MODIS) interpretation
 • Indian crop calendars (Kharif / Rabi / Zaid seasons)
 • Locally available, affordable fertilizer inputs
 • Practical ground-level farming advice
-
 Your communication style:
 • Clear, simple language — no jargon
 • Bullet points for easy reading
 • Specific product names, doses per acre, timing
 • Empathetic — you understand farmers' financial constraints
 • Always prioritize soil long-term health, not just quick fixes
-
 Format your response using EXACTLY the section structure given in the user prompt.
 Use ✅ ⚠️ 🔴 🟡 🟢 emojis to make status instantly visible.
 """.strip()
@@ -492,7 +484,6 @@ Use ✅ ⚠️ 🔴 🟡 🟢 emojis to make status instantly visible.
 
 def build_focused_prompt(df: pd.DataFrame, location: str, period: str,
                          n_passes: int, selected_param: str) -> str:
-    """Build a prompt focused ONLY on the selected parameter's time-series insights."""
     today      = date.today()
     month_name = today.strftime("%B %Y")
     mo         = today.month
@@ -500,9 +491,7 @@ def build_focused_prompt(df: pd.DataFrame, location: str, period: str,
                   "Rabi — Winter Season (Nov–Mar)"       if (mo >= 11 or mo <= 3) else
                   "Zaid — Summer Season (Mar–May)")
 
-    # ── Build time-series data for selected param ──
     if selected_param == "Soil Health Score":
-        # Compute health scores per date
         ts_rows = []
         for _, row in df.iterrows():
             snap = {p: row.get(p) for p in IDEAL_RANGES}
@@ -557,7 +546,6 @@ Total passes   : {n_passes} actual satellite overpasses
 Current date   : {month_name}
 Season         : {season}
 ════════════════════════════════════════════════════════
-
 SELECTED PARAMETER FOR ANALYSIS
   Parameter    : {param_label}
   ICAR ideal   : {ideal_str}
@@ -566,275 +554,247 @@ SELECTED PARAMETER FOR ANALYSIS
   Peak value   : {peak:.3f}{unit}
   Lowest value : {trough:.3f}{unit}
   Change       : {pct:+.1f}%  →  {trend}
-
 TIME-SERIES DATA (one row per satellite pass)
 ──────────────────────────────────────────────────────────────────────
 {time_series_str}
 ──────────────────────────────────────────────────────────────────────
-
-════════════════════════════════════════════════════════
-GENERATE A FOCUSED ADVISORY FOR THIS PARAMETER IN EXACTLY THIS FORMAT:
-════════════════════════════════════════════════════════
-
+GENERATE A FOCUSED ADVISORY IN EXACTLY THIS FORMAT:
 ## 📊 {param_label} — Satellite Time-Series Insight
-
 ### 🔍 What the Data Shows
-(2–3 bullets describing the trend pattern across the satellite passes — plain language)
 • ...
 • ...
-
 ---
-
 ### ⚠️ Current Status & Risk
 **Status: {status_icon}**
-- **What this means for your crop:** (one line — direct impact)
-- **Why it may have changed:** (one line — likely cause based on trend)
+- **What this means for your crop:** (one line)
+- **Why it may have changed:** (one line)
 - **Risk if not addressed:** (one line)
-
 ---
-
 ### ✅ Recommended Action
-(Exactly 3 specific, affordable steps — product name, dose per acre, timing)
 1. **[Action]** — [what, product, dose/acre, when]
 2. ...
 3. ...
-
 ---
-
 ### 📅 Watch Points
 - **Next check date:** [specific date 15–20 days from now]
 - **Warning sign to watch for:** [one observable field sign]
 - **Target value to reach:** [specific number with unit]
-
 ---
 *Based on {n_passes} Sentinel-2 passes · ICAR standards · FarmMatrix*
-
 RULES:
-- Focus ONLY on {selected_param} — do not discuss other parameters
-- Explain trends across the time-series (not just the latest value)
+- Focus ONLY on {selected_param}
 - Use only locally available Indian inputs
 - Doses per acre only
 - Keep total length 200–280 words
-- No jargon — write for a farmer with 8th grade education
 """
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  GROQ CALL
-# ─────────────────────────────────────────────────────────────────────────────
 def call_groq(prompt: str) -> str | None:
     try:
         client = OpenAI(api_key=GROQ_API_KEY, base_url="https://api.groq.com/openai/v1")
         resp   = client.chat.completions.create(
             model=GROQ_MODEL,
             messages=[
-                {"role": "system",  "content": SYSTEM_PROMPT},
-                {"role": "user",    "content": prompt},
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user",   "content": prompt},
             ],
             max_tokens=800,
             temperature=0.30,
         )
         return resp.choices[0].message.content.strip()
     except Exception as exc:
-        logging.error(f"Groq API: {exc}"); return None
+        logging.error(f"Groq API: {exc}")
+        return None
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-#  STREAMLIT APP
-# ═══════════════════════════════════════════════════════════════════════════════
-st.set_page_config(page_title="FarmMatrix · Time Series", layout="wide", page_icon="🌾")
+# ─────────────────────────────────────────────────────────────────────────────
+#  FASTAPI APP
+# ─────────────────────────────────────────────────────────────────────────────
+app = FastAPI(title="FarmMatrix API", version="2.0.0")
 
-st.markdown(
-    "<h1 style='margin-bottom:4px'>🌾 FarmMatrix — Satellite Nutrient Tracking</h1>"
-    "<p style='color:#888;margin-top:0'>"
-    "Every Sentinel-2 overpass captured · ICAR-aligned · AI soil scientist advisory"
-    "</p>",
-    unsafe_allow_html=True
-)
-st.markdown("---")
-
-# ── Dynamic defaults: end = today, start = 1 month ago ───────────────────────
-today         = date.today()
-default_end   = today
-default_start = today - relativedelta(months=1)
-
-# ── Sidebar ───────────────────────────────────────────────────────────────────
-with st.sidebar:
-    st.header("📍 Field Location")
-    if "loc" not in st.session_state:
-        st.session_state.loc = [18.4575, 73.8503]
-    lat = st.number_input("Latitude",  value=st.session_state.loc[0], format="%.6f")
-    lon = st.number_input("Longitude", value=st.session_state.loc[1], format="%.6f")
-    st.session_state.loc = [lat, lon]
-
-    st.markdown("---")
-    st.header("📅 Date Range")
-    st.caption(
-        f"Default: last 30 days  "
-        f"({default_start.strftime('%d %b')} → {default_end.strftime('%d %b %Y')})"
-    )
-
-    start_date = st.date_input("Start Date", value=default_start,
-                               max_value=today - timedelta(days=1))
-    end_date   = st.date_input("End Date",   value=default_end,
-                               max_value=today)
-
-    if start_date >= end_date:
-        st.error("Start date must be before End date.")
-        st.stop()
-
-    st.markdown("---")
-    st.header("🗺️ Display Parameter")
-    st.caption("Default: Soil Health Score — overall ICAR rating")
-
-    selected_param = st.selectbox(
-        "Select what to plot",
-        ALL_PARAMS,
-        index=0,
-        format_func=lambda x: FULL_NAME.get(x, x),
-    )
-
-
-# ── Map ───────────────────────────────────────────────────────────────────────
-st.subheader("1️⃣  Draw Your Field on the Map")
-st.caption(
-    "Use the **polygon** or **rectangle** tool (left toolbar).  "
-    "Draw around your field — analysis will start automatically."
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-m = folium.Map(location=[lat, lon], zoom_start=15)
-Draw(export=True).add_to(m)
-folium.TileLayer(
-    "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
-    attr="Google Satellite"
-).add_to(m)
-folium.Marker([lat, lon], popup="Centre", tooltip="Centre").add_to(m)
-map_data = st_folium(m, width=None, height=460,
-                     returned_objects=["last_active_drawing"])
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-region = None
-if map_data and map_data.get("last_active_drawing"):
+
+# ── Pydantic models ────────────────────────────────────────────────────────
+class AnalyseFullRequest(BaseModel):
+    """
+    Single unified request model.
+    All fields required except selected_param (defaults to 'Soil Health Score')
+    and location (defaults to 'Unknown Location').
+    """
+    coordinates: List[List[Any]]       # GeoJSON polygon ring: [[lng, lat], ...]
+    start_date: str                     # "YYYY-MM-DD"
+    end_date: str                       # "YYYY-MM-DD"
+    selected_param: str = "Soil Health Score"   # parameter for chart + AI insight
+    location: str = "Unknown Location"  # human-readable name shown in AI advisory
+    include_chart: bool = True          # set False to skip chart generation (faster)
+    include_insight: bool = True        # set False to skip AI advisory (faster)
+
+
+# ── Health check ─────────────────────────────────────────────────────────────
+@app.get("/health")
+async def health():
+    return {"status": "ok", "service": "FarmMatrix"}
+
+
+# ── Serve frontend ────────────────────────────────────────────────────────────
+@app.get("/", response_class=HTMLResponse)
+async def index():
+    html_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
+    with open(html_path, "r") as f:
+        return HTMLResponse(content=f.read())
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  SINGLE UNIFIED ENDPOINT
+# ─────────────────────────────────────────────────────────────────────────────
+@app.post("/api/analyse")
+async def api_analyse(req: AnalyseFullRequest):
+    """
+    Full pipeline in one call:
+      1. Discover all Sentinel-2 satellite pass dates in the date range
+      2. Fetch soil/vegetation snapshot for every pass
+      3. Compute per-pass health scores + latest-pass summary
+      4. Generate chart (base64 PNG) for selected_param
+      5. Generate AI advisory for selected_param
+
+    Returns a single JSON with all results.
+
+    Typical wall-clock time: 2–8 minutes depending on date range and farm size.
+    """
+    loop = asyncio.get_event_loop()
+
+    # ── 1. Parse inputs ──────────────────────────────────────────────────────
     try:
-        coords = map_data["last_active_drawing"]["geometry"]["coordinates"]
-        region = ee.Geometry.Polygon(coords)
-        st.success("✅ Field polygon detected — running satellite analysis automatically...")
+        start  = datetime.strptime(req.start_date, "%Y-%m-%d").date()
+        end    = datetime.strptime(req.end_date,   "%Y-%m-%d").date()
+        region = ee.Geometry.Polygon(req.coordinates)
     except Exception as exc:
-        st.error(f"Polygon error: {exc}")
+        raise HTTPException(status_code=422, detail=f"Invalid input: {exc}")
 
-# ── Auto-run when polygon detected ───────────────────────────────────────────
-if region is not None:
-    # Only re-fetch if polygon/dates changed (use a hash as cache key)
-    cache_key = f"{str(map_data.get('last_active_drawing'))}_{start_date}_{end_date}"
+    period = f"{req.start_date} to {req.end_date}"
 
-    if st.session_state.get("_cache_key") != cache_key:
-        st.session_state["_cache_key"] = cache_key
-
-        with st.spinner("🛰️ Scanning for Sentinel-2 satellite passes over your field..."):
-            visit_dates = get_all_visit_dates(region, start_date, end_date)
-
-        if not visit_dates:
-            st.error(
-                "No Sentinel-2 data found for this region and date range. "
-                "Try extending the date range or choosing a different area."
-            )
-            st.stop()
-
-        st.info(
-            f"🛰️ Found **{len(visit_dates)} satellite passes** "
-            f"between {start_date.strftime('%d %b')} and {end_date.strftime('%d %b %Y')}  —  "
-            f"fetching nutrients for each pass..."
-        )
-
-        pb     = st.progress(0)
-        status = st.empty()
-        df     = fetch_all_visits(region, visit_dates, pb, status)
-        status.empty()
-
-        st.session_state["df"]          = df
-        st.session_state["location"]    = f"Lat {lat:.5f}, Lon {lon:.5f}"
-        st.session_state["period"]      = (f"{start_date.strftime('%d %b %Y')} "
-                                           f"to {end_date.strftime('%d %b %Y')}")
-        st.session_state["n_passes"]    = len(visit_dates)
-        st.session_state["visit_dates"] = [d.strftime("%d %b %Y") for d in visit_dates]
-
-
-# ── Results ───────────────────────────────────────────────────────────────────
-if "df" in st.session_state:
-    df        = st.session_state["df"]
-    loc       = st.session_state["location"]
-    per       = st.session_state["period"]
-    n_passes  = st.session_state["n_passes"]
-    vdates    = st.session_state["visit_dates"]
-
-    st.markdown("---")
-
-    # ── Pass summary strip ─────────────────────────────────────────────────────
-    col_a, col_b, col_c = st.columns(3)
-    with col_a:
-        st.metric("🛰️ Satellite Passes", n_passes)
-    with col_b:
-        st.metric("📅 Period", per)
-    with col_c:
-        latest_score = None
-        if not df.empty:
-            last_row = df.dropna(subset=list(IDEAL_RANGES.keys()), how="all").iloc[-1] if not df.empty else None
-            if last_row is not None:
-                snap = {p: last_row.get(p) for p in IDEAL_RANGES}
-                latest_score = health_score(snap)
-        if latest_score is not None:
-            rating = ("Excellent" if latest_score >= 80 else
-                      "Good"      if latest_score >= 60 else
-                      "Fair"      if latest_score >= 40 else "Poor")
-            st.metric("🌱 Latest Health Score", f"{latest_score:.0f}% — {rating}")
-
-    with st.expander(f"📋 Show all {n_passes} satellite pass dates"):
-        st.write("  ·  ".join(vdates))
-
-    st.markdown("---")
-
-    # ── Chart ─────────────────────────────────────────────────────────────────
-    st.markdown(f"### 📊 {FULL_NAME.get(selected_param, selected_param)}")
-
-    if selected_param == "Soil Health Score":
-        buf = chart_health_score(df)
-    else:
-        buf = chart_single_param(df, selected_param)
-
-    if buf:
-        st.image(buf, use_container_width=True)
-    else:
-        st.info(f"No usable data for **{selected_param}** in this period and region.")
-
-    st.caption(
-        "🟢 Green dot = Within ICAR ideal range  ·  "
-        "🟡 Orange dot = Below ideal  ·  "
-        "🔴 Red dot = Above ideal  ·  "
-        "🟩 Green band = ICAR ideal range  ·  "
-        "Each dot = one actual satellite overpass"
+    # ── 2. Discover satellite pass dates ─────────────────────────────────────
+    visit_dates: list[date] = await loop.run_in_executor(
+        None, get_all_visit_dates, region, start, end
     )
 
-    # ── AI Advisory — focused on selected parameter ────────────────────────────
-    st.markdown("---")
-    st.markdown(f"### 🤖 AI Insight — {FULL_NAME.get(selected_param, selected_param)}")
-    st.caption(
-        "Dr. Arjun Patil · Senior Soil Scientist · 30 years field experience  |  "
-        "Powered by Groq LLaMA 3.3-70B · ICAR-calibrated · For guidance only"
-    )
-
-    with st.spinner(f"📝 Analysing {selected_param} trends across {n_passes} satellite passes..."):
-        prompt  = build_focused_prompt(df, loc, per, n_passes, selected_param)
-        insight = call_groq(prompt) if prompt else None
-
-    if insight:
-        st.markdown(insight)
-    else:
-        st.warning(
-            "⚠️ AI report could not be generated.  "
-            "Check your Groq API key or internet connection."
+    if not visit_dates:
+        raise HTTPException(
+            status_code=404,
+            detail="No Sentinel-2 passes found for this region and date range. "
+                   "Try a wider date range or check coordinates."
         )
 
-st.markdown("---")
-st.caption(
-    "FarmMatrix · Sentinel-2 (ESA Copernicus) + MODIS (NASA) · "
-    "ICAR Soil Health Card Standards"
-)
+    n_passes = len(visit_dates)
+
+    # ── 3. Fetch snapshot for each pass ──────────────────────────────────────
+    records: list[dict] = []
+    for day in visit_dates:
+        snap = await loop.run_in_executor(None, fetch_snapshot, region, day)
+        records.append({
+            "date": day.strftime("%Y-%m-%d"),
+            **(snap if snap else {p: None for p in IDEAL_RANGES})
+        })
+
+    # ── 4. Build DataFrame ───────────────────────────────────────────────────
+    df = pd.DataFrame(records)
+    df["date"] = pd.to_datetime(df["date"])
+    df = df.sort_values("date").reset_index(drop=True)
+
+    # ── 5. Compute summary (latest pass) ────────────────────────────────────
+    last_row = df.dropna(subset=list(IDEAL_RANGES.keys()), how="all").iloc[-1]
+    snap_latest = {p: last_row.get(p) for p in IDEAL_RANGES}
+    hs = health_score(snap_latest)
+    rating = ("Excellent" if hs >= 80 else "Good" if hs >= 60 else "Fair" if hs >= 40 else "Poor")
+
+    params_summary: dict = {}
+    for p in IDEAL_RANGES:
+        v = snap_latest.get(p)
+        params_summary[p] = {
+            "value":  round(float(v), 3) if _is_valid(v) else None,
+            "status": param_status(p, v),
+            "unit":   UNIT_MAP.get(p, ""),
+            "label":  FULL_NAME.get(p, p),
+        }
+
+    # ── 6. Per-pass health scores ────────────────────────────────────────────
+    pass_scores: list[dict] = []
+    for _, row in df.iterrows():
+        s = {p: row.get(p) for p in IDEAL_RANGES}
+        pass_scores.append({
+            "date":         row["date"].strftime("%Y-%m-%d"),
+            "health_score": round(health_score(s), 1),
+        })
+
+    # ── 7. Chart ─────────────────────────────────────────────────────────────
+    chart_b64: str | None = None
+    if req.include_chart:
+        if req.selected_param == "Soil Health Score":
+            chart_b64 = await loop.run_in_executor(None, chart_health_score, df)
+        else:
+            chart_b64 = await loop.run_in_executor(None, chart_single_param, df, req.selected_param)
+
+    # ── 8. AI advisory ───────────────────────────────────────────────────────
+    ai_insight: str | None = None
+    if req.include_insight:
+        prompt = build_focused_prompt(df, req.location, period, n_passes, req.selected_param)
+        if prompt:
+            ai_insight = await loop.run_in_executor(None, call_groq, prompt)
+
+    # ── 9. Build and return full response ────────────────────────────────────
+    return {
+        # ── Meta ──────────────────────────────────────────────────────────
+        "meta": {
+            "location":       req.location,
+            "period":         period,
+            "n_passes":       n_passes,
+            "pass_dates":     [d.strftime("%Y-%m-%d") for d in visit_dates],
+            "selected_param": req.selected_param,
+        },
+
+        # ── Latest-pass summary ───────────────────────────────────────────
+        "summary": {
+            "health_score": round(hs, 1),
+            "rating":       rating,
+            "params":       params_summary,
+        },
+
+        # ── Full time-series (one row per pass) ───────────────────────────
+        "time_series": {
+            "records":      [
+                {**r, "date": pd.Timestamp(r["date"]).strftime("%Y-%m-%d")}
+                for r in records
+            ],
+            "pass_scores":  pass_scores,
+        },
+
+        # ── Chart (base64 PNG, null if include_chart=false) ───────────────
+        "chart": {
+            "image":        chart_b64,          # decode as PNG or embed in <img src="data:image/png;base64,...">
+            "mime":         "image/png",
+            "param":        req.selected_param,
+        },
+
+        # ── AI advisory (null if include_insight=false) ───────────────────
+        "ai_insight": {
+            "text":         ai_insight,
+            "param":        req.selected_param,
+            "model":        GROQ_MODEL,
+        },
+    }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  ENTRY POINT
+# ─────────────────────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 7860))
+    uvicorn.run("app:app", host="0.0.0.0", port=port, reload=False)
