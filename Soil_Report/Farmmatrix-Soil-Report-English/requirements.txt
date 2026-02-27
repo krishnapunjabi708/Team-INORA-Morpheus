@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+earthengine-api
+pandas
+matplotlib
+reportlab
+google-generativeai
+pydantic
+python-dateutil
+Pillow
+google-auth
