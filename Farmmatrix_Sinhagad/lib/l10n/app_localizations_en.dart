@@ -148,6 +148,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get viewReport => 'View Report';
 
   @override
+  String get onboardingDesc1 => 'A platform designed to help you understand your soil like never before.';
+
+  @override
+  String get onboardingDesc2 => 'Delivering clear soil fertility insights for smarter farming decisions.';
+
+  @override
   String get soilReportDescription => 'Get a detailed analysis of soil nutrients and parameters with health score';
 
   @override
@@ -167,6 +173,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ok => 'OK';
+
+  @override
+  String get skip => 'Skip';
 
   @override
   String errorGettingLocation(Object message) {

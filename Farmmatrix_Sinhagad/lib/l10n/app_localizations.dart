@@ -367,6 +367,18 @@ abstract class AppLocalizations {
   /// **'View Report'**
   String get viewReport;
 
+  /// No description provided for @onboardingDesc1.
+  ///
+  /// In en, this message translates to:
+  /// **'A platform designed to help you understand your soil like never before.'**
+  String get onboardingDesc1;
+
+  /// No description provided for @onboardingDesc2.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivering clear soil fertility insights for smarter farming decisions.'**
+  String get onboardingDesc2;
+
   /// No description provided for @soilReportDescription.
   ///
   /// In en, this message translates to:
@@ -408,6 +420,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OK'**
   String get ok;
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
 
   /// No description provided for @errorGettingLocation.
   ///

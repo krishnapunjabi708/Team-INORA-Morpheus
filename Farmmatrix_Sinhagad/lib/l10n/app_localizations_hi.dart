@@ -148,6 +148,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String get viewReport => 'View Report';
 
   @override
+  String get onboardingDesc1 => 'एक ऐसा प्लेटफॉर्म जो आपको अपनी मिट्टी को पहले से बेहतर समझने में मदद करता है।';
+
+  @override
+  String get onboardingDesc2 => 'स्मार्ट खेती के लिए स्पष्ट मिट्टी उर्वरता जानकारी प्रदान करता है।';
+
+  @override
   String get soilReportDescription => 'मृदा पोषक तत्वों और पैरामीटरों का विस्तृत विश्लेषण प्राप्त करें जिसमें स्वास्थ्य स्कोर शामिल है';
 
   @override
@@ -167,6 +173,9 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get ok => 'ठीक है';
+
+  @override
+  String get skip => 'छोड़ें';
 
   @override
   String errorGettingLocation(Object message) {
