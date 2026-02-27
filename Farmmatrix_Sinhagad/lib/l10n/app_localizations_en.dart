@@ -30,6 +30,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get marathi => 'Marathi';
 
   @override
+  String get tamil => 'Tamil';
+
+  @override
+  String get punjabi => 'Punjabi';
+
+  @override
+  String get telugu => 'Telugu';
+
+  @override
+  String get language => 'Language:';
+
+  @override
   String get farmMatrix => 'FARMMATRIX';
 
   @override
