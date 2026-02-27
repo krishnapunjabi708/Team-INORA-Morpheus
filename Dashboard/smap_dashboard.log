@@ -1,0 +1,63 @@
+2025-05-27 20:11:53,727 - INFO - You're now authenticated with NASA Earthdata Login
+2025-05-27 20:12:01,547 - INFO - Successfully logged into Earthdata via Earthaccess.
+2025-05-27 20:12:03,464 - INFO - Granules found: 8794
+2025-05-27 20:12:06,236 - INFO - Earthaccess authentication validated successfully.
+2025-05-27 20:12:13,259 - INFO - Google Earth Engine initialized successfully.
+2025-05-27 20:12:34,894 - INFO - Successfully logged into Earthdata via Earthaccess.
+2025-05-27 20:12:36,750 - INFO - Granules found: 8794
+2025-05-27 20:12:37,384 - INFO - Earthaccess authentication validated successfully.
+2025-05-27 20:12:39,214 - INFO - Google Earth Engine initialized successfully.
+2025-05-27 20:12:45,756 - INFO - Successfully logged into Earthdata via Earthaccess.
+2025-05-27 20:12:47,295 - INFO - Granules found: 8794
+2025-05-27 20:12:48,029 - INFO - Earthaccess authentication validated successfully.
+2025-05-27 20:12:52,132 - INFO - Google Earth Engine initialized successfully.
+2025-05-27 20:12:52,165 - INFO - Created temporary directory: C:\Users\pavan\AppData\Local\Temp\smap_tezlfj24
+2025-05-27 20:12:52,165 - INFO - Searching for SPL3SMP data on 2025-05-27
+2025-05-27 20:12:53,749 - INFO - Granules found: 0
+2025-05-27 20:12:54,572 - INFO - Searching for SPL3SMP data on 2025-05-26
+2025-05-27 20:12:56,128 - INFO - Granules found: 2
+2025-05-27 20:12:56,909 - INFO - Found 2 granules for 2025-05-26
+2025-05-27 20:12:56,912 - INFO - Processing granule 1/2
+2025-05-27 20:12:56,912 - INFO -  Getting 1 granules, approx download size: 0.03 GB
+2025-05-27 20:13:10,815 - INFO - Successfully downloaded: C:\Users\pavan\AppData\Local\Temp\smap_tezlfj24\SMAP_L3_SM_P_20250526_R19240_001.h5
+2025-05-27 20:13:10,844 - INFO - Processing HDF5 file: SMAP_L3_SM_P_20250526_R19240_001.h5
+2025-05-27 20:13:10,891 - INFO - Valid soil moisture found: 0.4251 at distance 1.7736 degrees
+2025-05-27 20:13:10,892 - INFO - Successfully extracted soil moisture: 0.4251
+2025-05-27 20:13:10,899 - INFO - Cleaned up temporary directory: C:\Users\pavan\AppData\Local\Temp\smap_tezlfj24
+2025-05-27 20:13:12,614 - INFO - Using 33 Sentinel-2 images for pH calculation
+2025-05-27 20:13:14,567 - INFO - pH calculated: 7.15 ± 0.04 (n=396)
+2025-05-27 20:14:25,483 - INFO - Successfully logged into Earthdata via Earthaccess.
+2025-05-27 20:14:28,470 - INFO - Granules found: 8794
+2025-05-27 20:14:29,012 - INFO - Earthaccess authentication validated successfully.
+2025-05-27 20:14:31,933 - INFO - Google Earth Engine initialized successfully.
+2025-05-27 20:16:04,713 - INFO - Successfully logged into Earthdata via Earthaccess.
+2025-05-27 20:16:07,002 - INFO - Granules found: 8794
+2025-05-27 20:16:07,655 - INFO - Earthaccess authentication validated successfully.
+2025-05-27 20:16:10,082 - INFO - Google Earth Engine initialized successfully.
+2025-05-27 20:16:11,478 - INFO - Successfully logged into Earthdata via Earthaccess.
+2025-05-27 20:16:12,714 - INFO - Granules found: 8794
+2025-05-27 20:16:13,433 - INFO - Earthaccess authentication validated successfully.
+2025-05-27 20:16:16,833 - INFO - Google Earth Engine initialized successfully.
+2025-05-27 20:16:18,338 - INFO - Successfully logged into Earthdata via Earthaccess.
+2025-05-27 20:16:19,984 - INFO - Granules found: 8794
+2025-05-27 20:16:20,704 - INFO - Earthaccess authentication validated successfully.
+2025-05-27 20:16:25,332 - INFO - Google Earth Engine initialized successfully.
+2025-05-27 20:16:25,368 - INFO - Created temporary directory: C:\Users\pavan\AppData\Local\Temp\smap_7wf8rtca
+2025-05-27 20:16:25,371 - INFO - Searching for SPL3SMP data on 2025-05-27
+2025-05-27 20:16:27,047 - INFO - Granules found: 0
+2025-05-27 20:16:27,633 - INFO - Searching for SPL3SMP data on 2025-05-26
+2025-05-27 20:16:29,099 - INFO - Granules found: 2
+2025-05-27 20:16:29,714 - INFO - Found 2 granules for 2025-05-26
+2025-05-27 20:16:29,714 - INFO - Processing granule 1/2
+2025-05-27 20:16:29,714 - INFO -  Getting 1 granules, approx download size: 0.03 GB
+2025-05-27 20:16:45,146 - INFO - Successfully downloaded: C:\Users\pavan\AppData\Local\Temp\smap_7wf8rtca\SMAP_L3_SM_P_20250526_R19240_001.h5
+2025-05-27 20:16:45,166 - INFO - Processing HDF5 file: SMAP_L3_SM_P_20250526_R19240_001.h5
+2025-05-27 20:16:45,206 - INFO - Valid soil moisture found: 0.4251 at distance 1.7736 degrees
+2025-05-27 20:16:45,208 - INFO - Successfully extracted soil moisture: 0.4251
+2025-05-27 20:16:45,217 - INFO - Cleaned up temporary directory: C:\Users\pavan\AppData\Local\Temp\smap_7wf8rtca
+2025-05-27 20:16:46,184 - INFO - Using 33 Sentinel-2 images for pH calculation
+2025-05-27 20:16:47,571 - INFO - pH calculated: 7.33 ± 0.09 (n=1980)
+2025-05-27 21:16:31,054 - INFO - You're now authenticated with NASA Earthdata Login
+2025-05-27 21:16:38,422 - INFO - Successfully logged into Earthdata via Earthaccess.
+2025-05-27 21:16:40,576 - INFO - Granules found: 8794
+2025-05-27 21:53:00,073 - ERROR - Earthaccess login failed on attempt 1: HTTPSConnectionPool(host='urs.earthdata.nasa.gov', port=443): Max retries exceeded with url: /profile (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x0000022C2FAED220>: Failed to resolve 'urs.earthdata.nasa.gov' ([Errno 11001] getaddrinfo failed)"))

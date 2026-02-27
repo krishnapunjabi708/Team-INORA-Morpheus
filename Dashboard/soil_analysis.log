@@ -1,0 +1,24 @@
+2025-05-27 20:30:00,652 - INFO - You're now authenticated with NASA Earthdata Login
+2025-05-27 20:30:11,262 - INFO - Granules found: 8794
+2025-05-27 20:30:37,803 - INFO - Granules found: 8794
+2025-05-27 20:30:39,632 - INFO - Granules found: 8794
+2025-05-27 20:30:45,071 - INFO - Granules found: 0
+2025-05-27 20:30:46,831 - INFO - Granules found: 1
+2025-05-27 20:30:47,228 - INFO -  Getting 1 granules, approx download size: 0.64 GB
+2025-05-27 20:33:53,432 - ERROR - Granule error: "Unable to synchronously open object (object 'latitude_9km' doesn't exist)"
+2025-05-27 20:33:55,926 - INFO - Granules found: 2
+2025-05-27 20:33:56,724 - INFO -  Getting 1 granules, approx download size: 0.64 GB
+2025-05-27 20:35:11,755 - ERROR - Granule error: "Unable to synchronously open object (object 'latitude_9km' doesn't exist)"
+2025-05-27 20:35:11,755 - INFO -  Getting 1 granules, approx download size: 0.64 GB
+2025-05-27 20:35:11,757 - INFO - File SMAP_L3_SM_P_E_20250525_R19240_001.h5 already downloaded
+2025-05-27 20:35:11,761 - ERROR - Granule error: "Unable to synchronously open object (object 'latitude_9km' doesn't exist)"
+2025-05-27 20:35:14,995 - INFO - Granules found: 2
+2025-05-27 20:35:15,952 - INFO -  Getting 1 granules, approx download size: 0.61 GB
+2025-05-27 20:36:52,923 - INFO - You're now authenticated with NASA Earthdata Login
+2025-05-27 20:37:05,913 - INFO - Granules found: 7257
+2025-05-27 20:37:05,917 - INFO - Granules found: 7257
+2025-05-27 20:37:29,230 - INFO - Granules found: 7257
+2025-05-27 20:37:46,514 - INFO - Granules found: 7257
+2025-05-27 20:37:53,822 - INFO - Granules found: 0
+2025-05-27 20:37:56,753 - INFO - Granules found: 1
+2025-05-27 20:37:57,396 - INFO -  Getting 1 granules, approx download size: 0.64 GB

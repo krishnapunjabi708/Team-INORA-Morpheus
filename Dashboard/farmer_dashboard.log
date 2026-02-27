@@ -1,0 +1,8 @@
+2025-05-27 20:23:35,241 - INFO - Earthdata credentials configured successfully
+2025-05-27 20:23:39,037 - INFO - You're now authenticated with NASA Earthdata Login
+2025-05-27 20:23:48,599 - INFO - Granules found: 8794
+2025-05-27 20:24:02,273 - INFO - Earthdata credentials configured successfully
+2025-05-27 20:24:07,304 - INFO - Granules found: 8794
+2025-05-27 20:24:12,359 - INFO - Granules found: 0
+2025-05-27 20:24:14,920 - INFO - Granules found: 1
+2025-05-27 20:24:15,518 - INFO -  Getting 1 granules, approx download size: 0.64 GB
