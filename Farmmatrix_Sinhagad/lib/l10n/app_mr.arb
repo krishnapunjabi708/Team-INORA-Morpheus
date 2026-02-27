@@ -1,0 +1,334 @@
+{
+  "@@locale": "mr",
+  "welcomeMessage": "फार्ममॅट्रिक्समध्ये स्वागत - तुमचा सोपा शेती उपाय",
+  "getStarted": "सुरू करा",
+  "selectLanguage": "भाषा निवडा",
+  "next": "पुढे",
+  "english": "अंग्रेजी",
+  "hindi": "हिन्दी",
+  "farmMatrix": "फार्ममॅट्रिक्स",
+  "logIn": "लॉगिन करा",
+  "fullName": "पूर्ण नाव",
+  "phoneNo": "फोन नंबर",
+  "pleaseEnterName": "कृपया तुमचं नाव टाका",
+  "pleaseEnterPhoneNumber": "कृपया तुमचा फोन नंबर टाका",
+  "invalidPhoneNumber": "कृपया योग्य फोन नंबर टाका",
+  "locationServiceDisabledTitle": "स्थान सेवा बंद आहे",
+  "locationServiceDisabledMessage": "स्थान सेवा बंद आहे. कृपया ती सुरू करा.",
+  "cancel": "रद्द करा",
+  "openSettings": "सेटिंग्ज उघडा",
+  "locationPermissionRequiredTitle": "स्थान परवानगी हवी",
+  "locationPermissionRequiredMessage": "चांगली सेवा देण्यासाठी आम्हाला स्थान परवानगी हवी आहे.",
+  "locationPermissionPermanentlyDeniedTitle": "स्थान परवानगी कायमची नाकारली",
+  "locationPermissionPermanentlyDeniedMessage": "तुम्ही स्थान परवानगी कायमची नाकारली आहे. कृपया अॅप सेटिंग्जमध्ये ती सुरू करा.",
+  "locationServicesStillDisabled": "स्थान सेवा अजूनही बंद आहे",
+  "locationServicesRequired": "स्थान सेवा आवश्यक आहे",
+  "locationPermissionsStillDenied": "स्थान परवानगी अजूनही नाकारली आहे",
+  "locationPermissionsPermanentlyDenied": "स्थान परवानगी कायमची नाकारली आहे",
+  "processing": "काम चालू आहे...",
+  "goodMorning": "सुप्रभात",
+  "goodAfternoon": "शुभ दुपार",
+  "goodEvening": "शुभ संध्या",
+  "loadingUser": "वापरकर्ता लोड होत आहे...",
+  "welcomeUser": "नमस्कार, {name}",
+  "defaultUser": "वापरकर्ता",
+  "humidity": "आर्द्रता: {value}",
+  "weather": "हवामान",
+  "selectField": "शेत निवडा",
+  "addNewField": "नवीन शेत जोडा",
+  "selectedFieldLabel": "निवडलेलं शेत: ",
+  "noFieldSelected": "कोणतंही शेत निवडलेलं नाही",
+  "manageFields": "तुमची शेतं व्यवस्थापित करा",
+  "home": "होम",
+  "dashboard": "डॅशबोर्ड",
+  "profile": "प्रोफाइल",
+  "ok": "ठीक",
+  "errorGettingLocation": "स्थान मिळवण्यात चूक: {message}",
+  "errorFetchingWeather": "हवामान मिळवण्यात चूक",
+  "errorGettingAddress": "पत्ता मिळवण्यात चूक: {message}",
+  "weatherUnavailable": "हवामान माहिती उपलब्ध नाही",
+  "errorLoadingWeather": "हवामान लोड करण्यात चूक",
+  "locationServicesDisabled": "स्थान सेवा बंद आहे.",
+  "locationPermissionsDenied": "स्थान परवानगी नाकारली आहे.",
+  "error": "चूक: {message}",
+  "locationNotFound": "स्थान सापडलं नाही.",
+  "searchError": "शोध चूक: {message}",
+  "enterFieldName": "शेताचं नाव टाका",
+  "enterFieldNameHint": "शेताचं नाव टाका",
+  "save": "जतन करा",
+  "userIdNotFound": "वापरकर्ता आयडी सापडला नाही. कृपया लॉगिन करा.",
+  "invalidFieldData": "शेताचं नाव आणि योग्य आकार टाका.",
+  "fieldSavedSuccess": "शेत '{fieldName}' यशस्वीपणे जतन झालं!",
+  "searchLocation": "स्थान शोधा...",
+  "clearField": "शेत साफ करा",
+  "clear": "साफ करा",
+  "confirm": "पुष्टी करा",
+  "errorFetchingFields": "शेताची माहिती मिळवण्यात चूक: {message}",
+  "errorLoadingFields": "शेतं लोड करण्यात चूक",
+  "retry": "पुन्हा प्रयत्न करा",
+  "noFieldsAdded": "कोणतंही शेत जोडलेलं नाही",
+  "addFieldPrompt": "सुरू करण्यासाठी शेत जोडा",
+  "pleaseSelectAFieldFirst": "कृपया आधी शेत निवडा किंवा जोडा",
+  "noFieldsSelected": "हटवण्यासाठी कोणतंही शेत निवडलेलं नाही",
+  "fieldsDeletedSuccess": "निवडलेली शेतं यशस्वीपणे हटवली",
+  "errorDeletingFields": "शेतं हटवण्यात चूक: {message}",
+  "deleteSelected": "निवडलेली हटवा",
+  "fertilityMapping": "सुपीकतेचा आढावा",
+  "loadingFertilityMap": "सुपीकता नकाशा लोड होत आहे...",
+  "fertilityMapPeriod": "सुपीकता नकाशा: {startDate} ते {endDate}",
+  "fertilityLow": "कमी",
+  "fertilityModerate": "मध्यम",
+  "fertilityHigh": "जास्त",
+  "fieldDataMissing": "शेताची माहिती किंवा आकार गहाळ आहे",
+  "invalidGeometry": "चुकीचे आकार समन्वय",
+  "apiRequestFailed": "API विनंती अयशस्वी: {statusCode}",
+  "errorLoadingData": "डेटा लोड करण्यात चूक: {message}",
+  "soilReport": "मातीचा अहवाल",
+  "languageLabel": "भाषा:",
+  "invalidCoordinates": "चुकीचे समन्वय",
+  "failedToParseCoordinates": "समन्वय समजण्यात अयशस्वी: {message}",
+  "failedToParseGeometry": "आकार समजण्यात अयशस्वी: {message}",
+  "noCoordinatesAvailable": "कोणतेही समन्वय उपलब्ध नाहीत",
+  "failedToLoadReport": "अहवाल लोड करण्यात अयशस्वी: {message}",
+  "errorGeneratingReport": "अहवाल तयार करण्यात चूक: {message}",
+  "noPDFAvailable": "PDF उपलब्ध नाही",
+  "reportDownloadedSuccess": "अहवाल यशस्वीपणे डाउनलोड झाला",
+  "failedToDownloadReport": "अहवाल डाउनलोड करण्यात अयशस्वी: {message}",
+  "errorLoadingPDF": "PDF लोड करण्यात चूक: {message}",
+  "downloadReport": "अहवाल डाउनलोड करा",
+  "soilMonitoringDashboard": "माती निरीक्षण डॅशबोर्ड",
+  "fieldLabel": "शेत: {fieldName}",
+  "noFieldSelectedMessage": "कोणतंही शेत निवडलेलं नाही किंवा डेटा उपलब्ध नाही. कृपया होम स्क्रीनवरून शेत निवडा.",
+  "soilPh": "मातीचा पीएच",
+  "waterContent": "पाण्याची मात्रा",
+  "organicCarbon": "सेंद्रिय कार्बन",
+  "landSurfaceTemperature": "जमिनीचं तापमान",
+  "soilTexture": "मातीची रचना",
+  "soilSalinity": "मातीची खारटपणा",
+  "nutrientsHoldingCapacity": "पोषक तत्व ठेवण्याची क्षमता",
+  "nutrientsHoldingCapacityLine1": "पोषक",
+  "nutrientsHoldingCapacityLine2": "तत्व",
+  "nutrientsHoldingCapacityLine3": "ठेवण्याची",
+  "nutrientsHoldingCapacityLine4": "क्षमता",
+  "insights": "माहिती",
+  "na": "उपलब्ध नाही",
+  "dataUnavailable": "डेटा उपलब्ध नाही",
+  "unknown": "माहीत नाही",
+  "errorFetchingFieldData": "शेताचा डेटा मिळवण्यात चूक: {message}",
+  "errorFetchingData": "डेटा मिळवण्यात चूक: {message}",
+  "phStatusIdeal": "उत्तम",
+  "phStatusAcceptable": "ठीक",
+  "phStatusPoor": "खराब",
+  "phTooltipIdeal": "उत्तम / चांगली स्थिती",
+  "phTooltipMildlyAcidicAlkaline": "थोडं अम्लीय किंवा क्षारीय",
+  "phTooltipCorrectionNeeded": "माती दुरुस्तीची गरज",
+  "textureLoam": "दोमट",
+  "textureSandyLoam": "वाळू मिश्रित दोमट",
+  "textureSiltyLoam": "गाळ मिश्रित दोमट",
+  "textureTooltipGood": "चांगली मातीची रचना",
+  "textureTooltipWorkable": "काम करण्या योग्य, पण सुधारणा हवी",
+  "textureTooltipOrganicMatter": "सेंद्रिय खत घाला",
+  "salinityStatusVeryLow": "खूप कमी खारटपणा",
+  "salinityStatusLow": "कमी खारटपणा",
+  "salinityStatusModerate": "मध्यम खारटपणा",
+  "salinityStatusHigh": "जास्त खारटपणा",
+  "salinityStatusVeryHigh": "खूप जास्त खारटपणा",
+  "salinityTooltipExcellent": "पिकांसाठी उत्तम",
+  "salinityTooltipSuitable": "बहुतेक पिकांसाठी योग्य",
+  "salinityTooltipMonitor": "लक्ष ठेवा, संवेदनशील पिकांवर परिणाम होऊ शकतो",
+  "salinityTooltipTreatment": "उपचार हवे (जिप्सम, पाण्याने धुणे)",
+  "salinityTooltipPoor": "खराब माती, शेतीसाठी योग्य नाही",
+  "organicCarbonStatusRich": "जास्त सेंद्रिय कार्बन",
+  "organicCarbonStatusModerate": "मध्यम सेंद्रिय कार्बन",
+  "organicCarbonStatusLow": "कमी सेंद्रिय कार्बन",
+  "organicCarbonStatusWaterBody": "पाण्याचा भाग",
+  "organicCarbonTooltipGood": "चांगली सुपीकता",
+  "organicCarbonTooltipCompost": "सुपीकता वाढवण्यासाठी खत घाला",
+  "organicCarbonTooltipLow": "कमी सुपीकता",
+  "cecStatusHigh": "जास्त",
+  "cecStatusAverage": "मध्यम",
+  "cecStatusLow": "कमी",
+  "cecTooltipHigh": "जास्त पोषक तत्व ठेवण्याची क्षमता",
+  "cecTooltipAverage": "मध्यम पोषक तत्व ठेवण्याची क्षमता",
+  "cecTooltipLow": "मातीत पोषक तत्व ठेवण्याची कमतरता",
+  "lstStatusCool": "थंड क्षेत्र",
+  "lstStatusOptimal": "योग्य तापमान",
+  "lstStatusModerate": "मध्यम उष्णता",
+  "lstStatusHigh": "जास्त उष्णता ताण",
+  "lstStatusExtreme": "खूप जास्त ताण",
+  "lstTooltipCool": "बहुतेक पिकांसाठी योग्य; कमी बाष्पीभवन",
+  "lstTooltipOptimal": "पिकांच्या वाढीसाठी आधार देतं",
+  "lstTooltipModerate": "थोडी पाण्याची गरज असू शकते",
+  "lstTooltipHigh": "पाण्याची गरज; संवेदनशील पिकं टाळा",
+  "lstTooltipExtreme": "तात्काळ कृती करा; सावली किंवा मल्चिंग करा",
+  "waterContentStatusWaterBody": "पाण्याचा भाग/ताल",
+  "waterContentStatusAdequate": "पुरेसं पाणी",
+  "waterContentStatusMild": "थोडा पाण्याचा ताण",
+  "waterContentStatusModerate": "मध्यम पाण्याचा ताण",
+  "waterContentStatusDry": "कोरडं",
+  "waterContentTooltipWaterBody": "हा पाण्याचा भाग किंवा तलाव आहे",
+  "waterContentTooltipAdequate": "माती/झाडांमधील पाणी पुरेसं आहे—तात्काळ पाण्याची गरज नाही",
+  "waterContentTooltipMild": "थोडा पाण्याचा ताण—लवकर थोडं पाणी द्या",
+  "waterContentTooltipModerate": "मध्यम पाण्याचा ताण—काही दिवसांत पाणी द्या",
+  "waterContentTooltipDry": "पाण्याची खूप कमतरता—तात्काळ पाणी द्या",
+  "account": "खातं",
+  "helloUser": "नमस्कार, {name}",
+  "noPhone": "फोन नाही",
+  "myFields": "माझी शेतं",
+  "governmentSchemes": "सरकारी योजना",
+  "logout": "लॉगआउट",
+  "refreshUserData": "वापरकर्ता माहिती ताज्या करा",
+  "noUserIdFound": "वापरकर्ता आयडी सापडला नाही",
+  "errorFetchingUserData": "वापरकर्ता माहिती मिळवण्यात चूक: {message}",
+  "errorLoggingOut": "लॉगआउट करण्यात चूक: {message}",
+  "errorDecodingField": "शेताची माहिती समजण्यात चूक: {message}",
+  "selectedField": "निवडलेलं शेत: {fieldName}",
+  "pradhanMantriFasalBimaYojana": "प्रधानमंत्री पीक विमा योजना",
+  "kisanCreditCardScheme": "किसान क्रेडिट कार्ड योजना",
+  "paramparagatKrishiVikasYojana": "पारंपरिक शेती विकास योजना",
+  "yourSelectedField": "तुमचं निवडलेलं शेत",
+  "loadingFieldMap": "शेताचा नकाशा लोड होत आहे...",
+  "farmMatrixAssistant": "फार्ममॅट्रिक्स सहाय्यक",
+  "chatHistory": "चॅट इतिहास",
+  "newChat": "नवीन चॅट",
+  "askYourAssistant": "तुमच्या सहाय्यकाला विचारा",
+  "askAnything": "काहीही विचारा",
+  "rename": "नाव बदला",
+  "delete": "हटवा",
+  "renameChat": "चॅटचं नाव बदला",
+  "enterNewChatName": "नवीन चॅट नाव टाका",
+  "deleteChat": "चॅट हटवा",
+  "deleteChatConfirmation": "तुम्हाला खरंच हा चॅट हटवायचा आहे का? ही कृती परत करता येणार नाही.",
+  "apiErrorMessage": "माफ करा, तुमची विनंती पूर्ण करू शकलो नाही. पुन्हा प्रयत्न करा.",
+  "@welcomeUser": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@humidity": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "@errorGettingLocation": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@errorGettingAddress": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@error": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@searchError": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@fieldSavedSuccess": {
+    "placeholders": {
+      "fieldName": {}
+    }
+  },
+  "@errorFetchingFields": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@errorDeletingFields": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@fertilityMapPeriod": {
+    "placeholders": {
+      "startDate": {},
+      "endDate": {}
+    }
+  },
+  "@apiRequestFailed": {
+    "placeholders": {
+      "statusCode": {}
+    }
+  },
+  "@errorLoadingData": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@failedToLoadReport": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@errorGeneratingReport": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@failedToDownloadReport": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@errorLoadingPDF": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@failedToParseCoordinates": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@failedToParseGeometry": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@fieldLabel": {
+    "placeholders": {
+      "fieldName": {}
+    }
+  },
+  "@errorFetchingFieldData": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@errorFetchingData": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@helloUser": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@errorFetchingUserData": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@errorLoggingOut": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@errorDecodingField": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@selectedField": {
+    "placeholders": {
+      "fieldName": {}
+    }
+  }
+}

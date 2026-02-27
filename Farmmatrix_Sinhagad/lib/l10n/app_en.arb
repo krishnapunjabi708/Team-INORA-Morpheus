@@ -1,0 +1,334 @@
+{
+  "@@locale": "en",
+  "welcomeMessage": "Welcome to FarmMatrix - Your Smart Farming Solution",
+  "getStarted": "Get Started",
+  "selectLanguage": "Select Language",
+  "next": "Next",
+  "english": "English",
+  "hindi": "Hindi",
+  "farmMatrix": "FARMMATRIX",
+  "logIn": "Log In",
+  "fullName": "Full Name",
+  "phoneNo": "Phone Number",
+  "pleaseEnterName": "Please enter your name",
+  "pleaseEnterPhoneNumber": "Please enter your phone number",
+  "invalidPhoneNumber": "Please enter a valid phone number",
+  "locationServiceDisabledTitle": "Location Service Disabled",
+  "locationServiceDisabledMessage": "Location services are disabled. Please enable them to continue.",
+  "cancel": "Cancel",
+  "openSettings": "Open Settings",
+  "locationPermissionRequiredTitle": "Location Permission Required",
+  "locationPermissionRequiredMessage": "We need location permissions to provide better service.",
+  "locationPermissionPermanentlyDeniedTitle": "Location Permission Permanently Denied",
+  "locationPermissionPermanentlyDeniedMessage": "You have permanently denied location permissions. Please enable them in app settings.",
+  "locationServicesStillDisabled": "Location services are still disabled",
+  "locationServicesRequired": "Location services are required",
+  "locationPermissionsStillDenied": "Location permissions are still denied",
+  "locationPermissionsPermanentlyDenied": "Location permissions are permanently denied",
+  "processing": "Processing...",
+  "goodMorning": "Good Morning",
+  "goodAfternoon": "Good Afternoon",
+  "goodEvening": "Good Evening",
+  "loadingUser": "Loading user...",
+  "welcomeUser": "Welcome, {name}",
+  "defaultUser": "User",
+  "humidity": "Humidity: {value}",
+  "weather": "Weather",
+  "selectField": "Select Field",
+  "addNewField": "Add New Field",
+  "selectedFieldLabel": "Selected field: ",
+  "noFieldSelected": "No field selected",
+  "manageFields": "Manage your fields",
+  "home": "Home",
+  "dashboard": "Dashboard",
+  "profile": "Profile",
+  "ok": "OK",
+  "errorGettingLocation": "Error getting location: {message}",
+  "errorFetchingWeather": "Error fetching weather",
+  "errorGettingAddress": "Error getting address: {message}",
+  "weatherUnavailable": "Weather unavailable",
+  "errorLoadingWeather": "Error loading weather",
+  "locationServicesDisabled": "Location services are disabled.",
+  "locationPermissionsDenied": "Location permissions are denied.",
+  "error": "Error: {message}",
+  "locationNotFound": "Location not found.",
+  "searchError": "Search error: {message}",
+  "enterFieldName": "Enter Field Name",
+  "enterFieldNameHint": "Enter field name",
+  "save": "Save",
+  "userIdNotFound": "User ID not found. Please log in.",
+  "invalidFieldData": "Please fill in the field name and draw a valid polygon.",
+  "fieldSavedSuccess": "Field '{fieldName}' saved successfully!",
+  "searchLocation": "Search location...",
+  "clearField": "Clear Field",
+  "clear": "Clear",
+  "confirm": "Confirm",
+  "errorFetchingFields": "Error fetching fields: {message}",
+  "errorLoadingFields": "Error loading fields",
+  "retry": "Retry",
+  "noFieldsAdded": "No fields added",
+  "addFieldPrompt": "Please add your field to get started",
+  "pleaseSelectAFieldFirst": "Please select or add a field first",
+  "noFieldsSelected": "No fields selected for deletion",
+  "fieldsDeletedSuccess": "Selected fields deleted successfully",
+  "errorDeletingFields": "Error deleting fields: {message}",
+  "deleteSelected": "Delete Selected",
+  "fertilityMapping": "Fertility Mapping",
+  "loadingFertilityMap": "Loading fertility map...",
+  "fertilityMapPeriod": "Fertility Map: {startDate} to {endDate}",
+  "fertilityLow": "Low",
+  "fertilityModerate": "Moderate",
+  "fertilityHigh": "High",
+  "fieldDataMissing": "Field data or geometry missing",
+  "invalidGeometry": "Invalid geometry coordinates",
+  "apiRequestFailed": "API request failed: {statusCode}",
+  "errorLoadingData": "Error loading data: {message}",
+  "soilReport": "Advance Soil Report",
+  "languageLabel": "Language:",
+  "invalidCoordinates": "Invalid coordinates format",
+  "failedToParseCoordinates": "Failed to parse coordinates: {message}",
+  "failedToParseGeometry": "Failed to parse geometry: {message}",
+  "noCoordinatesAvailable": "No coordinates available",
+  "failedToLoadReport": "Failed to load report: {message}",
+  "errorGeneratingReport": "Error generating report: {message}",
+  "noPDFAvailable": "No PDF available",
+  "reportDownloadedSuccess": "Report downloaded successfully",
+  "failedToDownloadReport": "Failed to download report: {message}",
+  "errorLoadingPDF": "Error loading PDF: {message}",
+  "downloadReport": "Download Report",
+  "soilMonitoringDashboard": "Soil Monitoring Dashboard",
+  "fieldLabel": "Field: {fieldName}",
+  "noFieldSelectedMessage": "No field selected or data unavailable. Please select a field from the Home screen.",
+  "soilPh": "Soil pH",
+  "waterContent": "Water Content",
+  "organicCarbon": "Organic Carbon",
+  "landSurfaceTemperature": "Land Surface Temperature",
+  "soilTexture": "Soil Texture",
+  "soilSalinity": "Soil Salinity",
+  "nutrientsHoldingCapacity": "Nutrients Holding Capacity",
+  "nutrientsHoldingCapacityLine1": "Nutrients",
+  "nutrientsHoldingCapacityLine2": "Holding",
+  "nutrientsHoldingCapacityLine3": "Capacity",
+  "nutrientsHoldingCapacityLine4": " ",
+  "insights": "Insights",
+  "na": "N/A",
+  "dataUnavailable": "Data unavailable",
+  "unknown": "Unknown",
+  "errorFetchingFieldData": "Error fetching field data: {message}",
+  "errorFetchingData": "Error fetching data: {message}",
+  "phStatusIdeal": "Ideal",
+  "phStatusAcceptable": "Acceptable",
+  "phStatusPoor": "Poor",
+  "phTooltipIdeal": "Ideal / Good condition",
+  "phTooltipMildlyAcidicAlkaline": "Mildly acidic or alkaline",
+  "phTooltipCorrectionNeeded": "Soil correction needed",
+  "textureLoam": "Loam",
+  "textureSandyLoam": "Sandy Loam",
+  "textureSiltyLoam": "Silty Loam",
+  "textureTooltipGood": "Good soil texture",
+  "textureTooltipWorkable": "Workable, but needs improvement",
+  "textureTooltipOrganicMatter": "Add organic matter",
+  "salinityStatusVeryLow": "Very Low Salinity",
+  "salinityStatusLow": "Low Salinity",
+  "salinityStatusModerate": "Moderate Salinity",
+  "salinityStatusHigh": "High Salinity",
+  "salinityStatusVeryHigh": "Very High Salinity",
+  "salinityTooltipExcellent": "Excellent for crops",
+  "salinityTooltipSuitable": "Suitable for most crops",
+  "salinityTooltipMonitor": "Monitor, may affect sensitive crops",
+  "salinityTooltipTreatment": "Needs treatment (gypsum, leaching)",
+  "salinityTooltipPoor": "Poor soil, not ideal for farming",
+  "organicCarbonStatusRich": "Rich Organic Carbon",
+  "organicCarbonStatusModerate": "Moderate Organic Carbon",
+  "organicCarbonStatusLow": "Low Organic Carbon",
+  "organicCarbonStatusWaterBody": "Water Body",
+  "organicCarbonTooltipGood": "Good fertility",
+  "organicCarbonTooltipCompost": "Add compost to increase fertility",
+  "organicCarbonTooltipLow": "Low fertility",
+  "cecStatusHigh": "High",
+  "cecStatusAverage": "Average",
+  "cecStatusLow": "Low",
+  "cecTooltipHigh": "High nutrient holding",
+  "cecTooltipAverage": "Average nutrient holding",
+  "cecTooltipLow": "Soil lacks holding power",
+  "lstStatusCool": "Cool Zone",
+  "lstStatusOptimal": "Optimal temperature",
+  "lstStatusModerate": "Moderate heat",
+  "lstStatusHigh": "High heat stress",
+  "lstStatusExtreme": "Extreme stress",
+  "lstTooltipCool": "Ideal for most crops; low evapotranspiration",
+  "lstTooltipOptimal": "Supports active crop growth",
+  "lstTooltipModerate": "May need light irrigation",
+  "lstTooltipHigh": "Irrigation required; avoid sowing sensitive crops",
+  "lstTooltipExtreme": "Immediate action needed; consider shade or mulching",
+  "waterContentStatusWaterBody": "Water body/Lake",
+  "waterContentStatusAdequate": "Adequate moisture",
+  "waterContentStatusMild": "Mild stress",
+  "waterContentStatusModerate": "Moderate stress",
+  "waterContentStatusDry": "Dry",
+  "waterContentTooltipWaterBody": "It is a water body or a lake",
+  "waterContentTooltipAdequate": "Soil/vegetation moisture is adequate—no immediate irrigation needed",
+  "waterContentTooltipMild": "Mild moisture stress—consider light irrigation soon",
+  "waterContentTooltipModerate": "Moderate stress—plan irrigation within few days",
+  "waterContentTooltipDry": "Severe moisture deficit—irrigate immediately",
+  "account": "Account",
+  "helloUser": "Hello, {name}",
+  "noPhone": "No phone",
+  "myFields": "My Fields",
+  "governmentSchemes": "Government Schemes",
+  "logout": "Logout",
+  "refreshUserData": "Refresh User Data",
+  "noUserIdFound": "No user ID found in SharedPreferences",
+  "errorFetchingUserData": "Error fetching user data: {message}",
+  "errorLoggingOut": "Error logging out: {message}",
+  "errorDecodingField": "Error decoding saved field: {message}",
+  "selectedField": "Selected field: {fieldName}",
+  "pradhanMantriFasalBimaYojana": "Pradhan Mantri Fasal Bima Yojana",
+  "kisanCreditCardScheme": "Kisan Credit Card Scheme",
+  "paramparagatKrishiVikasYojana": "Paramparagat Krishi Vikas Yojana",
+  "yourSelectedField": "Your Selected Field",
+  "loadingFieldMap": "Loading field map...",
+  "farmMatrixAssistant": "FarmMatrix Assistant",
+  "chatHistory": "Chat History",
+  "newChat": "New Chat",
+  "askYourAssistant": "Ask your assistant",
+  "askAnything": "Ask anything",
+  "rename": "Rename",
+  "delete": "Delete",
+  "renameChat": "Rename Chat",
+  "enterNewChatName": "Enter new chat name",
+  "deleteChat": "Delete Chat",
+  "deleteChatConfirmation": "Are you sure you want to delete this chat? This action cannot be undone.",
+  "apiErrorMessage": "Sorry, I couldn't process your request. Please try again.",
+  "@welcomeUser": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@humidity": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "@errorGettingLocation": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@errorGettingAddress": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@error": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@searchError": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@fieldSavedSuccess": {
+    "placeholders": {
+      "fieldName": {}
+    }
+  },
+  "@errorFetchingFields": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@errorDeletingFields": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@fertilityMapPeriod": {
+    "placeholders": {
+      "startDate": {},
+      "endDate": {}
+    }
+  },
+  "@apiRequestFailed": {
+    "placeholders": {
+      "statusCode": {}
+    }
+  },
+  "@errorLoadingData": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@failedToLoadReport": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@errorGeneratingReport": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@failedToDownloadReport": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@errorLoadingPDF": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@failedToParseCoordinates": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@failedToParseGeometry": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@fieldLabel": {
+    "placeholders": {
+      "fieldName": {}
+    }
+  },
+  "@errorFetchingFieldData": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@errorFetchingData": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@helloUser": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@errorFetchingUserData": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@errorLoggingOut": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@errorDecodingField": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@selectedField": {
+    "placeholders": {
+      "fieldName": {}
+    }
+  }
+}

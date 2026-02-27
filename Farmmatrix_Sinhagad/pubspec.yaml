@@ -1,0 +1,78 @@
+name: farmmatrix
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.1.0
+  flutter_svg: ^2.0.17
+  geolocator: ^13.0.2
+  geocoding: ^3.0.0
+  google_maps_flutter: ^2.5.3
+  shared_preferences: ^2.5.3
+  provider: ^6.1.1
+  http: ^1.2.0
+  intl: ^0.20.2
+  flutter_localizations:
+    sdk: flutter
+  supabase_flutter: ^2.8.4
+  flutter_secure_storage: ^9.2.4
+  flutter_otp_text_field: ^1.5.1+1
+  otp_text_field: ^1.1.3
+  flutter_map: ^8.1.1
+  latlong2: ^0.9.1
+  image_picker: ^1.1.2
+  dio: ^5.8.0+1
+  flutter_typeahead: ^5.2.0
+  fl_chart: ^0.70.2
+  ulid: ^2.0.1
+  url_launcher: ^6.3.1
+  webview_flutter: ^4.13.0
+  path_provider: ^2.1.5
+  open_file: ^3.5.10
+  pdf: ^3.11.3
+  country_code_picker: ^3.3.0
+  permission_handler: ^12.0.0+1
+  record: ^6.0.0
+  audioplayers: ^6.4.0
+  web_socket_channel: ^2.4.0
+  just_audio: ^0.10.3
+  flutter_pdfview: ^1.4.0+1
+  vapi: ^0.0.9
+  flutter_map_tile_caching: ^10.1.1
+  flutter_dotenv: ^5.1.0
+
+dependency_overrides:
+  permission_handler: ^12.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter:
+  uses-material-design: true
+  generate: true
+  assets:
+    - assets/images/logo2.png
+    - assets/images/
+    - assets/fonts/PlusJakartaSans-VariableFont_wght.ttf
+  fonts:
+    - family: PlusJakartaSans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans-VariableFont_wght.ttf
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo2.png"
+  min_sdk_android: 16
+  remove_alpha_ios: true
