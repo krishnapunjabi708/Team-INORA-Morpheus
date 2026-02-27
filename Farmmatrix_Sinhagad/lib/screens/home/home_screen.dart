@@ -245,282 +245,182 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xFFF1F1F1),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        leadingWidth: 68,
-        leading: Row(
-          children: [
-            const SizedBox(width: 18),
-            Image.asset('assets/images/logo.png', width: 47, height: 47),
-          ],
-        ),
-        title: Text(
-          AppLocalizations.of(context)!.farmMatrix,
-          style: TextStyle(
-            fontFamily: AppConfig.fontFamily,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppConfig.secondaryColor,
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
+      body: SafeArea(
+        child: SingleChildScrollView(
+        child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Welcome User Name
-              _isLoadingUser
-                  ? Text(
-                      AppLocalizations.of(context)!.loadingUser,
-                      style: TextStyle(
-                        fontFamily: AppConfig.fontFamily,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppConfig.primaryColor,
-                      ),
-                    )
-                  : Text(
-                      AppLocalizations.of(context)!.welcomeUser(
-                        _currentUser?.fullName.isNotEmpty == true
-                            ? _currentUser!.fullName
-                            : AppLocalizations.of(context)!.defaultUser,
-                      ),
-                      style: TextStyle(
-                        fontFamily: AppConfig.fontFamily,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        foreground: Paint()
-                          ..shader = LinearGradient(
-                            colors: [
-                              AppConfig.primaryColor,
-                              AppConfig.primaryColor.withOpacity(0.8),
-                            ],
-                          ).createShader(const Rect.fromLTWH(0, 0, 200, 70)),
-                      ),
-                    ),
-              const SizedBox(height: 16),
-
-              // Select Field and Add New Field Buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SelectFieldDropdown(
-                              onFieldSelected: (FieldInfoModel? field) {
-                                setState(() {
-                                  _selectedField = field;
-                                });
-                                _saveSelectedField(field);
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppConfig.primaryColor,
-                        side: BorderSide(color: AppConfig.primaryColor),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.arrow_drop_down,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            AppLocalizations.of(context)!.selectField,
-                            style: const TextStyle(
-                              fontFamily: AppConfig.fontFamily,
-                              fontSize: 15,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddFieldScreen(),
-                          ),
-                        ).then((_) {
-                          setState(() {});
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppConfig.primaryColor,
-                        side: BorderSide(color: AppConfig.primaryColor),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            AppLocalizations.of(context)!.addNewField,
-                            style: const TextStyle(
-                              fontFamily: AppConfig.fontFamily,
-                              fontSize: 15,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+              Container(
+                height: 210,
+                width: double.infinity,
+                color: Colors.white,
+                child: Image.asset(
+                  'assets/images/header_image.png',
+                  fit: BoxFit.contain,
+                  alignment: Alignment.center,
+                ),
               ),
-              const SizedBox(height: 16),
-
-              // Selected Field and Location/Weather Row
-              Row(
-                children: [
-                  // Selected Field Rectangle
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: AppConfig.primaryColor,
-                          width: 1,
+              // Welcome User Name
+              
+               Transform.translate(
+                offset: const Offset(0, -30),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(13, 13, 13, 13),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.10),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
                         ),
-                      ),
-                      child: Text(
-                        _selectedField?.fieldName ??
-                            AppLocalizations.of(context)!.noFieldSelected,
-                        style: TextStyle(
-                          fontFamily: AppConfig.fontFamily,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppConfig.primaryColor,
-                        ),
-                      ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  // Location and Weather Rectangle
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: AppConfig.primaryColor,
-                          width: 1,
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.location_on,
-                                color: AppConfig.primaryColor,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  _address,
-                                  style: TextStyle(
-                                    fontFamily: AppConfig.fontFamily,
-                                    fontSize: 14,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Welcome + cloud
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            /// LEFT SIDE → Cloud + Welcome
+                            Row(
+                              children: [
+                                Image.asset(
+                                  'assets/images/cloud.png',
+                                  width: 22,
+                                  height: 22,
+                                  fit: BoxFit.contain,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  _isLoadingUser
+                                      ? loc.loading
+                                      : loc.welcomeUser(
+                                        _currentUser?.fullName ??
+                                            loc.defaultUser,
+                                      ),
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF1B413C),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const Spacer(),
+
+                            /// RIGHT SIDE → Location + Weather + Temp
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.location_on,
+                                  size: 16,
+                                  color: Color(0xFF1B413C),
+                                ),
+
+                                const SizedBox(width: 4),
+
+                                Text(
+                                  '$_address ${_temperature ?? ''}',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF1B413C),
                                     fontWeight: FontWeight.w500,
                                   ),
-                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
+                              ],
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 15),
+
+                        // Current Field
+                        Center(
+                          child: Column(
                             children: [
-                              if (_weatherIconUrl != null)
-                                Container(
-                                  width: 24,
-                                  height: 24,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: Image.network(
-                                      _weatherIconUrl!,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) =>
-                                          Icon(
-                                        Icons.cloud,
-                                        size: 20,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ),
+                              Text(
+                                loc.currentField,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFF1B413C),
                                 ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      _weatherDescription ??
-                                          AppLocalizations.of(context)!.weather,
-                                      style: TextStyle(
-                                        fontFamily: AppConfig.fontFamily,
-                                        fontSize: 12,
-                                        color: Colors.black87,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Text(
-                                      _temperature ?? '--°C',
-                                      style: TextStyle(
-                                        fontFamily: AppConfig.fontFamily,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                _selectedField?.fieldName ??
+                                    loc.noFieldSelected,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1B413C),
                                 ),
+                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Select & Add buttons
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _FieldActionButton(
+                                label: loc.selectField,
+                                backgroundColor: const Color(0xFFD9D9D9),
+                                icon: Icons.arrow_drop_down,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => SelectFieldDropdown(
+                                            onFieldSelected: (field) {
+                                              setState(
+                                                () => _selectedField = field,
+                                              );
+                                              _saveSelectedField(field);
+                                            },
+                                          ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _FieldActionButton(
+                                label: loc.addNewField,
+                                backgroundColor: const Color(0xFFFFD358),
+                                icon: Icons.add,
+                                textColor: Colors.black87,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const AddFieldScreen(),
+                                    ),
+                                  ).then((_) => setState(() {}));
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
-              const SizedBox(height: 16),
-
               // Horizontal Line
               Container(
                 height: 1,
@@ -797,8 +697,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 25),
             ],
           ),
-        ),
-      ),
+      ),),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         type: BottomNavigationBarType.fixed,
@@ -831,6 +730,225 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+class _FieldActionButton extends StatelessWidget {
+  final String label;
+  final Color backgroundColor;
+  final IconData icon;
+  final Color? textColor;
+  final VoidCallback onPressed;
+
+  const _FieldActionButton({
+    required this.label,
+    required this.backgroundColor,
+    required this.icon,
+    this.textColor,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        foregroundColor: textColor ?? Colors.black87,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        elevation: 0,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 22),
+          const SizedBox(width: 10),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Updated FeatureCard with overlap & overflow fixes
+class FeatureCard extends StatelessWidget {
+  final String bgImagePath;
+  final String iconPath;
+  final String title;
+  final String description;
+  final String buttonLabel;
+  final VoidCallback onTap;
+
+  const FeatureCard({
+    super.key,
+    required this.bgImagePath,
+    required this.iconPath,
+    required this.title,
+    required this.description,
+    required this.buttonLabel,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 270, // increased to give more vertical space
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Background image
+              Positioned.fill(
+                child: Image.asset(
+                  bgImagePath,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
+                ),
+              ),
+
+              // White bottom section – taller and more padding
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: 151, // increased from 150 → fixes overflow
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(
+                    16,
+                    20,
+                    16,
+                    16,
+                  ), // more top space
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(
+                      bottom: Radius.circular(20),
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Left content – description now wraps properly
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF2A2A2A),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Flexible(
+                              child: Text(
+                                description,
+                                softWrap: true,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey[700],
+                                  height: 1.35,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Right side: circle + pill
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Yellow circle – still overlaps background, but safer value
+                          Transform.translate(
+                            offset: const Offset(
+                              0,
+                              -40,
+                            ), // was -36 → slightly less aggressive
+                            child: Container(
+                              width: 72,
+                              height: 72,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFFFD358),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Image.asset(
+                                  iconPath,
+                                  width: 44,
+                                  height: 44,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Pill – moved up but not too much → no overflow
+                          Transform.translate(
+                            offset: const Offset(
+                              0,
+                              -22,
+                            ), // was -28 → safer value
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD9D9D9),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    buttonLabel,
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  const Icon(
+                                    Icons.arrow_forward,
+                                    size: 16,
+                                    color: Colors.black87,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 
 

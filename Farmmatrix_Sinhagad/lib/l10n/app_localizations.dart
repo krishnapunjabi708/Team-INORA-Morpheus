@@ -151,6 +151,18 @@ abstract class AppLocalizations {
   /// **'Full Name'**
   String get fullName;
 
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// No description provided for @currentField.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Field'**
+  String get currentField;
+
   /// No description provided for @phoneNo.
   ///
   /// In en, this message translates to:

@@ -30,6 +30,8 @@
   "goodAfternoon": "शुभ दुपार",
   "goodEvening": "शुभ संध्या",
   "loadingUser": "वापरकर्ता लोड होत आहे...",
+  "loading": "लोड होत आहे...",
+  "currentField": "सध्याचे शेत",
   "welcomeUser": "नमस्कार, {name}",
   "defaultUser": "वापरकर्ता",
   "humidity": "आर्द्रता: {value}",

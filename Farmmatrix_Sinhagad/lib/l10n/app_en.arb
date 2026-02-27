@@ -9,6 +9,8 @@
   "farmMatrix": "FARMMATRIX",
   "logIn": "Log In",
   "fullName": "Full Name",
+  "loading": "Loading...",
+  "currentField": "Current Field",
   "phoneNo": "Phone Number",
   "pleaseEnterName": "Please enter your name",
   "pleaseEnterPhoneNumber": "Please enter your phone number",

@@ -36,6 +36,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fullName => 'Full Name';
 
   @override
+  String get loading => 'Loading...';
+
+  @override
+  String get currentField => 'Current Field';
+
+  @override
   String get phoneNo => 'Phone Number';
 
   @override

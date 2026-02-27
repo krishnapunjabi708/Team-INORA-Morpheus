@@ -36,6 +36,12 @@ class AppLocalizationsMr extends AppLocalizations {
   String get fullName => 'पूर्ण नाव';
 
   @override
+  String get loading => 'लोड होत आहे...';
+
+  @override
+  String get currentField => 'सध्याचे शेत';
+
+  @override
   String get phoneNo => 'फोन नंबर';
 
   @override
