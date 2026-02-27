@@ -355,6 +355,42 @@ abstract class AppLocalizations {
   /// **'Dashboard'**
   String get dashboard;
 
+  /// No description provided for @soilReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Soil Report'**
+  String get soilReportTitle;
+
+  /// No description provided for @viewReport.
+  ///
+  /// In en, this message translates to:
+  /// **'View Report'**
+  String get viewReport;
+
+  /// No description provided for @soilReportDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Get a detailed analysis of soil nutrients and parameters with health score'**
+  String get soilReportDescription;
+
+  /// No description provided for @fertilityMappingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertility Mapping'**
+  String get fertilityMappingTitle;
+
+  /// No description provided for @fertilityMappingDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Get zone-wise fertility map on your selected field'**
+  String get fertilityMappingDescription;
+
+  /// No description provided for @viewMap.
+  ///
+  /// In en, this message translates to:
+  /// **'View Map'**
+  String get viewMap;
+
   /// No description provided for @profile.
   ///
   /// In en, this message translates to:

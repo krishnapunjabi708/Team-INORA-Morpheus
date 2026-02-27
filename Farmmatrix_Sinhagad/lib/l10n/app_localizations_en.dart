@@ -142,6 +142,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboard => 'Dashboard';
 
   @override
+  String get soilReportTitle => 'Soil Report';
+
+  @override
+  String get viewReport => 'View Report';
+
+  @override
+  String get soilReportDescription => 'Get a detailed analysis of soil nutrients and parameters with health score';
+
+  @override
+  String get fertilityMappingTitle => 'Fertility Mapping';
+
+  @override
+  String get fertilityMappingDescription => 'Get zone-wise fertility map on your selected field';
+
+  @override
+  String get viewMap => 'View Map';
+
+  @override
   String get profile => 'Profile';
 
   @override

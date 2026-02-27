@@ -142,6 +142,24 @@ class AppLocalizationsHi extends AppLocalizations {
   String get dashboard => 'डैशबोर्ड';
 
   @override
+  String get soilReportTitle => 'मृदा रिपोर्ट';
+
+  @override
+  String get viewReport => 'View Report';
+
+  @override
+  String get soilReportDescription => 'मृदा पोषक तत्वों और पैरामीटरों का विस्तृत विश्लेषण प्राप्त करें जिसमें स्वास्थ्य स्कोर शामिल है';
+
+  @override
+  String get fertilityMappingTitle => 'उर्वरता मानचित्रण';
+
+  @override
+  String get fertilityMappingDescription => 'अपने चयनित खेत पर क्षेत्र-वार उर्वरता मानचित्र प्राप्त करें';
+
+  @override
+  String get viewMap => 'मानचित्र देखें';
+
+  @override
   String get profile => 'प्रोफाइल';
 
   @override

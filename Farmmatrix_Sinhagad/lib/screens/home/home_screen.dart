@@ -421,280 +421,67 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              // Horizontal Line
-              Container(
-                height: 1,
-                width: double.infinity,
-                color: AppConfig.primaryColor,
-              ),
-              const SizedBox(height: 16),
-
-              // Manage Your Fields Text
-              Text(
-                'Manage your fields',
-                style: TextStyle(
-                  fontFamily: AppConfig.fontFamily,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppConfig.primaryColor,
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Fertility Mapping Section
-              GestureDetector(
-                onTap: () {
-                  if (_selectedField != null) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            SoilReportScreen(fieldId: _selectedField!.id),
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          AppLocalizations.of(context)!.pleaseSelectAFieldFirst,
-                        ),
-                        backgroundColor: Colors.black,
-                      ),
-                    );
-                  }
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppConfig.primaryColor,
-                      width: 1,
-                    ),
-                    gradient: const LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [Colors.white, Color.fromARGB(255, 139, 254, 229)],
-                    ),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Icon
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppConfig.primaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.satellite_alt,
-                          color: AppConfig.primaryColor,
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      // Content
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Get a detailed analysis of soil nutrients and parameters with health score',
-                              style: TextStyle(
-                                fontFamily: AppConfig.fontFamily,
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Soil Report',
-                              style: TextStyle(
-                                fontFamily: AppConfig.fontFamily,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            // View Map Button
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.black,
-                                        width: 1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: Colors.white,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'View Report',
-                                          style: TextStyle(
-                                            fontFamily: AppConfig.fontFamily,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        const Icon(
-                                          Icons.arrow_forward,
-                                          size: 16,
-                                          color: Colors.black,
-                                        ),
-                                      ],
-                                    ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    FeatureCard(
+                      bgImagePath: 'assets/images/soil_bg.jpeg',
+                      iconPath: 'assets/images/soil_report.png',
+                      title: loc.soilReportTitle,
+                      description: loc.soilReportDescription,
+                      buttonLabel: loc.viewReport,
+                      onTap: () {
+                        if (_selectedField != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => SoilReportScreen(
+                                    fieldId: _selectedField!.id,
                                   ),
-                                ),
-                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Market Analysis Section
-              GestureDetector(
-                onTap: () {
-                  if (_selectedField != null) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            SatelliteMappingScreen(fieldId: _selectedField!.id),
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          AppLocalizations.of(context)!.pleaseSelectAFieldFirst,
-                        ),
-                        backgroundColor: Colors.black,
-                      ),
-                    );
-                  }
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppConfig.primaryColor,
-                      width: 1,
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(loc.pleaseSelectAFieldFirst),
+                            ),
+                          );
+                        }
+                      },
                     ),
-                    gradient: const LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [Colors.white, Color(0xFFFEF98B)],
-                    ),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Icon
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppConfig.primaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.storefront,
-                          color: AppConfig.primaryColor,
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      // Content
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Get zone-wise fertility map on your selected field',
-                              style: TextStyle(
-                                fontFamily: AppConfig.fontFamily,
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Fertility Mapping',
-                              style: TextStyle(
-                                fontFamily: AppConfig.fontFamily,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            // View Analysis Button
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.black,
-                                        width: 1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: Colors.white,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'View Map',
-                                          style: TextStyle(
-                                            fontFamily: AppConfig.fontFamily,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        const Icon(
-                                          Icons.arrow_forward,
-                                          size: 16,
-                                          color: Colors.black,
-                                        ),
-                                      ],
-                                    ),
+                    const SizedBox(height: 24),
+                    FeatureCard(
+                      bgImagePath: 'assets/images/fertility_bg.jpeg',
+                      iconPath: 'assets/images/fertility.png',
+                      title: loc.fertilityMappingTitle,
+                      description: loc.fertilityMappingDescription,
+                      buttonLabel: loc.viewMap,
+                      onTap: () {
+                        if (_selectedField != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => SatelliteMappingScreen(
+                                    fieldId: _selectedField!.id,
                                   ),
-                                ),
-                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(loc.pleaseSelectAFieldFirst),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 25),
+               const SizedBox(height: 80),
             ],
           ),
       ),),
