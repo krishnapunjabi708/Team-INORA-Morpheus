@@ -749,4 +749,46 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get apiErrorMessage => 'माफ करा, तुमची विनंती पूर्ण करू शकलो नाही. पुन्हा प्रयत्न करा.';
+
+  @override
+  String get soilHealthHistoryTitle => 'माती आरोग्य इतिहास';
+
+  @override
+  String get soilHealthHistoryDescription => 'कालावधीतील माती आरोग्य विश्लेषण पहा';
+
+  @override
+  String get viewHistory => 'इतिहास पहा';
+
+  @override
+  String get soilHealthHistory => 'माती आरोग्य इतिहास';
+
+  @override
+  String get selectedParameter => 'निवडलेला पॅरामीटर';
+
+  @override
+  String get summary => 'सारांश';
+
+  @override
+  String get filter => 'फिल्टर';
+
+  @override
+  String get selectSoilParameter => 'माती पॅरामीटर निवडा';
+
+  @override
+  String get apply => 'लागू करा';
+
+  @override
+  String get noDataAvailable => 'डेटा उपलब्ध नाही';
+
+  @override
+  String get pleaseSelectParameter => 'कृपया फिल्टरमधून पॅरामीटर निवडा';
+
+  @override
+  String get selectDateRange => 'दिनांक कालावधी निवडा';
+
+  @override
+  String get lastMonth => 'मागील महिना';
+
+  @override
+  String get custom => 'कस्टम';
 }

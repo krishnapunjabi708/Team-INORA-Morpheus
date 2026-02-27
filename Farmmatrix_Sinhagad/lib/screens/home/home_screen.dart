@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:farmmatrix/screens/health_history/soil_health_history.dart';
 import 'package:farmmatrix/screens/soil_report/soil_report_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:farmmatrix/config/app_config.dart';
@@ -462,7 +463,34 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         }
                       },
-                    )
+                    ),
+                    const SizedBox(height: 24),
+                    FeatureCard(
+                      bgImagePath: 'assets/images/health_history_bg.jpeg',
+                      iconPath: 'assets/images/health_history.png',
+                      title: loc.soilHealthHistoryTitle,
+                      description: loc.soilHealthHistoryDescription,
+                      buttonLabel: loc.viewHistory,
+                      onTap: () {
+                        if (_selectedField != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => SoilHealthHistoryScreen(
+                                    fieldId: _selectedField!.id,
+                                  ),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(loc.pleaseSelectAFieldFirst),
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -477,8 +505,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         highlightElevation: 0,
-        onPressed: () {
-        },
+        onPressed: () {},
         child: Transform.scale(
           scale: 1.5,
           child: Image.asset(

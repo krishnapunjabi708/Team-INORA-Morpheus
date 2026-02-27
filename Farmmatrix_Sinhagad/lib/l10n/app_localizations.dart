@@ -1476,6 +1476,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sorry, I couldn\'t process your request. Please try again.'**
   String get apiErrorMessage;
+
+  /// No description provided for @soilHealthHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Soil Health History'**
+  String get soilHealthHistoryTitle;
+
+  /// No description provided for @soilHealthHistoryDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Track soil health trends over time'**
+  String get soilHealthHistoryDescription;
+
+  /// No description provided for @viewHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'View History'**
+  String get viewHistory;
+
+  /// No description provided for @soilHealthHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Soil Health History'**
+  String get soilHealthHistory;
+
+  /// No description provided for @selectedParameter.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected Parameter'**
+  String get selectedParameter;
+
+  /// No description provided for @summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get summary;
+
+  /// No description provided for @filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get filter;
+
+  /// No description provided for @selectSoilParameter.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Soil Parameter'**
+  String get selectSoilParameter;
+
+  /// No description provided for @apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get apply;
+
+  /// No description provided for @noDataAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No Data Available'**
+  String get noDataAvailable;
+
+  /// No description provided for @pleaseSelectParameter.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select the parameter from filter'**
+  String get pleaseSelectParameter;
+
+  /// No description provided for @selectDateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Date Range'**
+  String get selectDateRange;
+
+  /// No description provided for @lastMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Last month'**
+  String get lastMonth;
+
+  /// No description provided for @custom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get custom;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

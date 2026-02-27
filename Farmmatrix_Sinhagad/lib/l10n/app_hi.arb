@@ -232,6 +232,20 @@
   "deleteChat": "चैट हटाएँ",
   "deleteChatConfirmation": "क्या आप सचमुच इस चैट को हटाना चाहते हैं? इसे वापस नहीं लाया जा सकता।",
   "apiErrorMessage": "माफ करें, आपका अनुरोध पूरा नहीं हुआ। फिर से कोशिश करें।",
+  "soilHealthHistoryTitle": "मिट्टी स्वास्थ्य इतिहास",
+"soilHealthHistoryDescription": "समय के साथ मिट्टी स्वास्थ्य का विश्लेषण करें",
+"viewHistory": "इतिहास देखें",
+"soilHealthHistory": "मिट्टी स्वास्थ्य इतिहास",
+"selectedParameter": "चयनित पैरामीटर",
+"summary": "सारांश",
+"filter": "फ़िल्टर",
+"selectSoilParameter": "मिट्टी पैरामीटर चुनें",
+"apply": "लागू करें",
+"noDataAvailable": "कोई डेटा उपलब्ध नहीं",
+"pleaseSelectParameter": "कृपया फ़िल्टर से पैरामीटर चुनें",
+"selectDateRange": "तिथि सीमा चुनें",
+"lastMonth": "पिछला महीना",
+"custom": "कस्टम",
   "@welcomeUser": {
     "placeholders": {
       "name": {}

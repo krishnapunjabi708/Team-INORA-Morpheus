@@ -749,4 +749,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get apiErrorMessage => 'Sorry, I couldn\'t process your request. Please try again.';
+
+  @override
+  String get soilHealthHistoryTitle => 'Soil Health History';
+
+  @override
+  String get soilHealthHistoryDescription => 'Track soil health trends over time';
+
+  @override
+  String get viewHistory => 'View History';
+
+  @override
+  String get soilHealthHistory => 'Soil Health History';
+
+  @override
+  String get selectedParameter => 'Selected Parameter';
+
+  @override
+  String get summary => 'Summary';
+
+  @override
+  String get filter => 'Filter';
+
+  @override
+  String get selectSoilParameter => 'Select Soil Parameter';
+
+  @override
+  String get apply => 'Apply';
+
+  @override
+  String get noDataAvailable => 'No Data Available';
+
+  @override
+  String get pleaseSelectParameter => 'Please select the parameter from filter';
+
+  @override
+  String get selectDateRange => 'Select Date Range';
+
+  @override
+  String get lastMonth => 'Last month';
+
+  @override
+  String get custom => 'Custom';
 }

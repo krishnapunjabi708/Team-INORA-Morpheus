@@ -230,6 +230,20 @@
   "deleteChat": "Delete Chat",
   "deleteChatConfirmation": "Are you sure you want to delete this chat? This action cannot be undone.",
   "apiErrorMessage": "Sorry, I couldn't process your request. Please try again.",
+  "soilHealthHistoryTitle": "Soil Health History",
+"soilHealthHistoryDescription": "Track soil health trends over time",
+"viewHistory": "View History",
+"soilHealthHistory": "Soil Health History",
+"selectedParameter": "Selected Parameter",
+"summary": "Summary",
+"filter": "Filter",
+"selectSoilParameter": "Select Soil Parameter",
+"apply": "Apply",
+"noDataAvailable": "No Data Available",
+"pleaseSelectParameter": "Please select the parameter from filter",
+"selectDateRange": "Select Date Range",
+"lastMonth": "Last month",
+"custom": "Custom",
   "@welcomeUser": {
     "placeholders": {
       "name": {}

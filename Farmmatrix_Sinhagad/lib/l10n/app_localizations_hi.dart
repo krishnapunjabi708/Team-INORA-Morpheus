@@ -749,4 +749,46 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get apiErrorMessage => 'माफ करें, आपका अनुरोध पूरा नहीं हुआ। फिर से कोशिश करें।';
+
+  @override
+  String get soilHealthHistoryTitle => 'मिट्टी स्वास्थ्य इतिहास';
+
+  @override
+  String get soilHealthHistoryDescription => 'समय के साथ मिट्टी स्वास्थ्य का विश्लेषण करें';
+
+  @override
+  String get viewHistory => 'इतिहास देखें';
+
+  @override
+  String get soilHealthHistory => 'मिट्टी स्वास्थ्य इतिहास';
+
+  @override
+  String get selectedParameter => 'चयनित पैरामीटर';
+
+  @override
+  String get summary => 'सारांश';
+
+  @override
+  String get filter => 'फ़िल्टर';
+
+  @override
+  String get selectSoilParameter => 'मिट्टी पैरामीटर चुनें';
+
+  @override
+  String get apply => 'लागू करें';
+
+  @override
+  String get noDataAvailable => 'कोई डेटा उपलब्ध नहीं';
+
+  @override
+  String get pleaseSelectParameter => 'कृपया फ़िल्टर से पैरामीटर चुनें';
+
+  @override
+  String get selectDateRange => 'तिथि सीमा चुनें';
+
+  @override
+  String get lastMonth => 'पिछला महीना';
+
+  @override
+  String get custom => 'कस्टम';
 }
