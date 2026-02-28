@@ -833,4 +833,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failedToBook => 'Failed to book appointment';
+
+  @override
+  String get textureClayLoam => 'Clay Loam';
 }

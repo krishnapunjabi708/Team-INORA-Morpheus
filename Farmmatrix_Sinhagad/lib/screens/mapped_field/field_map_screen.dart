@@ -183,7 +183,7 @@ class _FieldMapScreenState extends State<FieldMapScreen> {
               color: Colors.white,
             ),
           ),
-          backgroundColor: const Color(0xFF178D38),
+          backgroundColor: const Color(0xFF1B413C),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {

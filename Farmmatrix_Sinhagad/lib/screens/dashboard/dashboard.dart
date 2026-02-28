@@ -4,12 +4,12 @@ import 'package:farmmatrix/screens/home/home_screen.dart';
 import 'package:farmmatrix/screens/profile/profile_screen.dart';
 import 'package:farmmatrix/models/field_info_model.dart';
 import 'package:farmmatrix/services/field_services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:farmmatrix/l10n/app_localizations.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class DashboardScreen extends StatefulWidget {
   final FieldInfoModel? selectedField;
@@ -145,7 +145,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
- Future<Map<String, dynamic>> _fetchSoilParameters({
+  Future<Map<String, dynamic>> _fetchSoilParameters({
     required double lat,
     required double lon,
     Map<String, dynamic>? geometry,
@@ -267,6 +267,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return loc.textureSandyLoam;
       case "silty loam":
         return loc.textureSiltyLoam;
+      case "clay loam": // ← add this line
+        return loc
+            .textureClayLoam; // make sure this key exists in your .arb file
       default:
         return loc.unknown;
     }

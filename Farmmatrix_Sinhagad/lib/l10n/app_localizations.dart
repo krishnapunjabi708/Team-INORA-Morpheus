@@ -1644,6 +1644,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to book appointment'**
   String get failedToBook;
+
+  /// No description provided for @textureClayLoam.
+  ///
+  /// In en, this message translates to:
+  /// **'Clay Loam'**
+  String get textureClayLoam;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

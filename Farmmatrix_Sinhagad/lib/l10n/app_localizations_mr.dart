@@ -833,4 +833,7 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get failedToBook => 'अपॉइंटमेंट बुक करने में असफल';
+
+  @override
+  String get textureClayLoam => 'चिकण दोमट';
 }

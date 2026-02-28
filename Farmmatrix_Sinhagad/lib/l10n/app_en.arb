@@ -259,6 +259,7 @@
   "bookAppointment": "Book Appointment",
   "appointmentBooked": "Your appointment is booked",
   "failedToBook": "Failed to book appointment",
+  "textureClayLoam": "Clay Loam",
   "@welcomeUser": {
     "placeholders": {
       "name": {}

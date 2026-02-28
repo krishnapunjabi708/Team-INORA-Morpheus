@@ -261,6 +261,7 @@
   "bookAppointment": "अपॉइंटमेंट बुक करें",
   "appointmentBooked": "आपका अपॉइंटमेंट बुक हो गया है",
   "failedToBook": "अपॉइंटमेंट बुक करने में असफल",
+  "textureClayLoam": "क्ले लोम",
   "@welcomeUser": {
     "placeholders": {
       "name": {}

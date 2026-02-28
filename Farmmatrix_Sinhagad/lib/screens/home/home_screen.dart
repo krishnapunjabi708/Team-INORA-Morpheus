@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:farmmatrix/screens/book_appointment/book_appointment.dart';
 import 'package:farmmatrix/screens/chatbot/chatbot_screen.dart';
 import 'package:farmmatrix/screens/health_history/soil_health_history.dart';
+import 'package:farmmatrix/screens/mapped_field/field_map_screen.dart';
 import 'package:farmmatrix/screens/soil_report/soil_report_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:farmmatrix/config/app_config.dart';
@@ -228,6 +229,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  String _formatAcres(double? acres) {
+    if (acres == null || acres <= 0) {
+      return '0.0 acres';
+    }
+    // Show 1 decimal place, remove trailing .0
+    return acres.toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '') + ' acres';
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -341,15 +350,48 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               const SizedBox(height: 6),
-                              Text(
-                                _selectedField?.fieldName ??
-                                    loc.noFieldSelected,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1B413C),
+                              GestureDetector(
+                                onTap:
+                                    _selectedField != null
+                                        ? () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) => FieldMapScreen(
+                                                    fieldId: _selectedField!.id,
+                                                  ),
+                                            ),
+                                          );
+                                        }
+                                        : null,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    child: Text(
+                                      _selectedField != null
+                                          ? '${_selectedField!.fieldName} (${_formatAcres(_selectedField!.areaInAcres)})'
+                                          : loc.noFieldSelected,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color:
+                                            _selectedField != null
+                                                ? const Color(0xFF116A2A)
+                                                : Color(0xFF1B413C),
+                                        decoration:
+                                            _selectedField != null
+                                                ? TextDecoration.underline
+                                                : null,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
                                 ),
-                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
