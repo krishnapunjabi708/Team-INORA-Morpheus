@@ -2,7 +2,6 @@ import os
 import json
 import logging
 import warnings
-import math
 import asyncio
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
@@ -18,12 +17,12 @@ import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
 from scipy import stats
 
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional, List, Any
+from typing import List, Any
 import uvicorn
 import ee
 from openai import OpenAI
@@ -90,9 +89,8 @@ COLOURS = {
     "NDVI":     "#2E7D32", "EVI":        "#388E3C", "FVC": "#81C784", "NDWI": "#1565C0",
 }
 
-ALL_PARAMS = ["Soil Health Score"] + list(IDEAL_RANGES.keys())
-ALL_BANDS  = ["B2", "B3", "B4", "B5", "B6", "B7", "B8", "B8A", "B11", "B12"]
-DOT_C      = {"good": "#43A047", "low": "#FF9800", "high": "#E53935", "na": "#9E9E9E"}
+ALL_BANDS = ["B2", "B3", "B4", "B5", "B6", "B7", "B8", "B8A", "B11", "B12"]
+DOT_C     = {"good": "#43A047", "low": "#FF9800", "high": "#E53935", "na": "#9E9E9E"}
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  EARTH ENGINE INIT
@@ -102,42 +100,38 @@ def initialize_ee():
     try:
         credentials_base64 = os.getenv("GEE_SERVICE_ACCOUNT_KEY")
         if not credentials_base64:
-            raise ValueError("❌ Google Earth Engine credentials are missing.")
+            raise ValueError("GEE_SERVICE_ACCOUNT_KEY env var is missing.")
         credentials_json_str = base64.b64decode(credentials_base64).decode("utf-8")
         credentials_dict = json.loads(credentials_json_str)
         from ee import ServiceAccountCredentials
-        credentials = ServiceAccountCredentials(credentials_dict['client_email'], key_data=credentials_json_str)
+        credentials = ServiceAccountCredentials(
+            credentials_dict["client_email"], key_data=credentials_json_str
+        )
         ee.Initialize(credentials)
         ee_initialized = True
         logging.info("✅ Google Earth Engine initialized successfully.")
     except Exception as e:
         ee_initialized = False
-        logging.error(f"❌ Google Earth Engine initialization failed: {e}")
+        logging.error(f"❌ GEE initialization failed: {e}")
         raise
 
 initialize_ee()
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  SATELLITE FUNCTIONS
+#  SATELLITE HELPERS
 # ─────────────────────────────────────────────────────────────────────────────
 def get_all_visit_dates(region, start: date, end: date) -> list:
-    s = start.strftime("%Y-%m-%d")
-    e = end.strftime("%Y-%m-%d")
     try:
         coll = (
             ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
-            .filterDate(s, e)
+            .filterDate(start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
             .filterBounds(region)
             .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 80))
         )
         dates_ms = coll.aggregate_array("system:time_start").getInfo()
         if not dates_ms:
             return []
-        unique_dates = sorted({
-            datetime.utcfromtimestamp(ms / 1000).date()
-            for ms in dates_ms
-        })
-        return unique_dates
+        return sorted({datetime.utcfromtimestamp(ms / 1000).date() for ms in dates_ms})
     except Exception as exc:
         logging.error(f"get_all_visit_dates: {exc}")
         return []
@@ -221,7 +215,7 @@ def get_cec(comp, region):
         clay = comp.expression("(B11-B8)/(B11+B8+1e-6)",
                                {"B11": comp.select("B11"), "B8": comp.select("B8")}).rename("clay")
         om   = comp.expression("(B8-B4)/(B8+B4+1e-6)",
-                               {"B8": comp.select("B8"),  "B4": comp.select("B4")}).rename("om")
+                               {"B8": comp.select("B8"), "B4": comp.select("B4")}).rename("om")
         c_m  = clay.reduceRegion(ee.Reducer.mean(), region, 20, maxPixels=1e13).get("clay").getInfo()
         o_m  = om.reduceRegion(ee.Reducer.mean(),   region, 20, maxPixels=1e13).get("om").getInfo()
         if c_m is None or o_m is None: return None
@@ -300,7 +294,7 @@ def health_score(snap: dict) -> float:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  FETCH
+#  FETCH SNAPSHOT
 # ─────────────────────────────────────────────────────────────────────────────
 def fetch_snapshot(region, day: date) -> dict | None:
     comp = single_day_composite(region, day)
@@ -328,9 +322,57 @@ def fetch_snapshot(region, day: date) -> dict | None:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  CHARTS
+#  SHARED: fetch snapshots → sorted DataFrame
+#  (called by both endpoints to avoid code duplication)
 # ─────────────────────────────────────────────────────────────────────────────
-def chart_health_score(df: pd.DataFrame) -> str | None:
+async def _build_dataframe(req_coordinates, req_start, req_end) -> tuple:
+    """
+    Returns (region, visit_dates, df) or raises HTTPException.
+    """
+    loop = asyncio.get_event_loop()
+    try:
+        start  = datetime.strptime(req_start, "%Y-%m-%d").date()
+        end    = datetime.strptime(req_end,   "%Y-%m-%d").date()
+        region = ee.Geometry.Polygon(req_coordinates)
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=f"Invalid input: {exc}")
+
+    visit_dates = await loop.run_in_executor(None, get_all_visit_dates, region, start, end)
+    if not visit_dates:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                "No Sentinel-2 passes found for this region and date range. "
+                "Try a wider date range or verify the coordinates."
+            ),
+        )
+
+    records = []
+    for day in visit_dates:
+        snap = await loop.run_in_executor(None, fetch_snapshot, region, day)
+        records.append({
+            "date": day.strftime("%Y-%m-%d"),
+            **(snap if snap else {p: None for p in IDEAL_RANGES}),
+        })
+
+    df = pd.DataFrame(records)
+    df["date"] = pd.to_datetime(df["date"])
+    df = df.sort_values("date").reset_index(drop=True)
+    return region, visit_dates, df
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  CHART RENDERERS  (return raw PNG bytes)
+# ─────────────────────────────────────────────────────────────────────────────
+def _fig_to_png(fig) -> bytes:
+    buf = BytesIO()
+    fig.savefig(buf, format="png", dpi=130, bbox_inches="tight")
+    plt.close(fig)
+    buf.seek(0)
+    return buf.read()
+
+
+def render_health_score_chart(df: pd.DataFrame) -> bytes | None:
     clean = df[df["date"].notna()].copy()
     if clean.empty: return None
 
@@ -380,15 +422,10 @@ def chart_health_score(df: pd.DataFrame) -> str | None:
     ax.spines[["top","right"]].set_visible(False)
     ax.grid(axis="y", alpha=0.2, linestyle="--")
     plt.tight_layout()
-
-    buf = BytesIO()
-    fig.savefig(buf, format="png", dpi=130, bbox_inches="tight")
-    plt.close(fig)
-    buf.seek(0)
-    return base64.b64encode(buf.read()).decode("utf-8")
+    return _fig_to_png(fig)
 
 
-def chart_single_param(df: pd.DataFrame, param: str) -> str | None:
+def render_param_chart(df: pd.DataFrame, param: str) -> bytes | None:
     if param not in df.columns: return None
 
     tmp = df[df["date"].notna()].copy()
@@ -409,7 +446,6 @@ def chart_single_param(df: pd.DataFrame, param: str) -> str | None:
     ax.axhspan(y_lo, y_hi, color="#E8F5E9", alpha=0.55, zorder=0, label="ICAR ideal range")
     ax.axhline(y_lo, color="#81C784", lw=0.9, ls="--", alpha=0.7, zorder=1)
     ax.axhline(y_hi, color="#81C784", lw=0.9, ls="--", alpha=0.7, zorder=1)
-
     ax.fill_between(clean_dates, clean_vals, alpha=0.08, color=colour, zorder=1)
     ax.plot(clean_dates, clean_vals, color=colour, lw=2.2, zorder=3)
 
@@ -429,18 +465,19 @@ def chart_single_param(df: pd.DataFrame, param: str) -> str | None:
     pct = 0.0
     if len(clean_vals) >= 2:
         pct = (clean_vals[-1]-clean_vals[0]) / (abs(clean_vals[0])+1e-9) * 100
-    arrow = "↑" if pct > 1 else ("↓" if pct < -1 else "→")
+    arrow     = "↑" if pct > 1 else ("↓" if pct < -1 else "→")
     direction = "Increasing" if pct > 1 else ("Decreasing" if pct < -1 else "Stable")
 
     ax.set_title(f"{FULL_NAME.get(param, param)}", fontsize=11, fontweight="bold", pad=10)
-    ax.set_xlabel(f"Trend: {arrow} {direction}  ({pct:+.1f}% over period)  ·  "
-                  f"Each point = one Sentinel-2 satellite pass",
-                  fontsize=8.5, labelpad=6, color="#555")
+    ax.set_xlabel(
+        f"Trend: {arrow} {direction}  ({pct:+.1f}% over period)  ·  "
+        f"Each point = one Sentinel-2 satellite pass",
+        fontsize=8.5, labelpad=6, color="#555"
+    )
     ax.set_ylabel(f"Value{UNIT_MAP.get(param,'')}", fontsize=9)
     ax.tick_params(axis="x", labelrotation=35, labelsize=8)
     ax.spines[["top","right"]].set_visible(False)
     ax.grid(axis="y", alpha=0.2, linestyle="--")
-
     ax.legend(
         handles=[
             Line2D([0],[0], color=colour, lw=2.2, label=param),
@@ -450,12 +487,7 @@ def chart_single_param(df: pd.DataFrame, param: str) -> str | None:
         fontsize=8, loc="upper left", framealpha=0.65
     )
     plt.tight_layout()
-
-    buf = BytesIO()
-    fig.savefig(buf, format="png", dpi=130, bbox_inches="tight")
-    plt.close(fig)
-    buf.seek(0)
-    return base64.b64encode(buf.read()).decode("utf-8")
+    return _fig_to_png(fig)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -487,8 +519,8 @@ def build_focused_prompt(df: pd.DataFrame, location: str, period: str,
     today      = date.today()
     month_name = today.strftime("%B %Y")
     mo         = today.month
-    season     = ("Kharif — Monsoon Season (Jun–Oct)"   if 6 <= mo <= 10 else
-                  "Rabi — Winter Season (Nov–Mar)"       if (mo >= 11 or mo <= 3) else
+    season     = ("Kharif — Monsoon Season (Jun–Oct)"  if 6 <= mo <= 10 else
+                  "Rabi — Winter Season (Nov–Mar)"      if (mo >= 11 or mo <= 3) else
                   "Zaid — Summer Season (Mar–May)")
 
     if selected_param == "Soil Health Score":
@@ -497,34 +529,35 @@ def build_focused_prompt(df: pd.DataFrame, location: str, period: str,
             snap = {p: row.get(p) for p in IDEAL_RANGES}
             sc   = health_score(snap)
             ts_rows.append({"date": row["date"], "value": sc})
-        ts_df  = pd.DataFrame(ts_rows).dropna()
+        ts_df       = pd.DataFrame(ts_rows).dropna()
         param_label = "Overall Soil Health Score (%)"
-        lo, hi = 60.0, 100.0
-        unit   = "%"
+        lo, hi      = 60.0, 100.0
+        unit        = "%"
     else:
         if selected_param not in df.columns:
             return ""
         ts_df = df[["date", selected_param]].copy()
-        ts_df = ts_df[ts_df[selected_param].apply(_is_valid)].rename(columns={selected_param: "value"})
+        ts_df = ts_df[ts_df[selected_param].apply(_is_valid)].rename(
+            columns={selected_param: "value"}
+        )
         param_label = FULL_NAME.get(selected_param, selected_param)
-        lo, hi = IDEAL_RANGES.get(selected_param, (None, None))
-        unit   = UNIT_MAP.get(selected_param, "")
+        lo, hi      = IDEAL_RANGES.get(selected_param, (None, None))
+        unit        = UNIT_MAP.get(selected_param, "")
 
     if ts_df.empty:
         return ""
 
-    vals = [float(v) for v in ts_df["value"]]
+    vals      = [float(v) for v in ts_df["value"]]
     dates_str = [pd.Timestamp(d).strftime("%d %b %Y") for d in ts_df["date"]]
-
     time_series_str = "\n".join(
         f"  Pass {i+1} ({d}): {v:.3f}{unit}"
         for i, (d, v) in enumerate(zip(dates_str, vals))
     )
 
     first, last, avg = vals[0], vals[-1], sum(vals)/len(vals)
-    peak  = max(vals); trough = min(vals)
-    pct   = (last - first) / (abs(first) + 1e-9) * 100
-    trend = "RISING" if pct > 3 else ("FALLING" if pct < -3 else "STABLE")
+    peak   = max(vals); trough = min(vals)
+    pct    = (last - first) / (abs(first) + 1e-9) * 100
+    trend  = "RISING" if pct > 3 else ("FALLING" if pct < -3 else "STABLE")
 
     if selected_param != "Soil Health Score":
         current_status = param_status(selected_param, last)
@@ -534,7 +567,7 @@ def build_focused_prompt(df: pd.DataFrame, location: str, period: str,
         status_icon = ("🟢 GOOD" if last >= 60 else "🟡 FAIR" if last >= 40 else "🔴 POOR")
 
     ideal_str = (f"{lo}–{hi}{unit}" if (lo is not None and hi is not None) else
-                 (f"≤{hi}{unit}"    if lo is None else f"≥{lo}{unit}"))
+                 (f"≤{hi}{unit}" if lo is None else f"≥{lo}{unit}"))
 
     return f"""
 SATELLITE TIME-SERIES ADVISORY REQUEST
@@ -559,28 +592,28 @@ TIME-SERIES DATA (one row per satellite pass)
 {time_series_str}
 ──────────────────────────────────────────────────────────────────────
 GENERATE A FOCUSED ADVISORY IN EXACTLY THIS FORMAT:
-## 📊 {param_label} — Satellite Time-Series Insight
-### 🔍 What the Data Shows
+📊 {param_label} — Satellite Time-Series Insight
+🔍 What the Data Shows
 • ...
 • ...
 ---
-### ⚠️ Current Status & Risk
-**Status: {status_icon}**
-- **What this means for your crop:** (one line)
-- **Why it may have changed:** (one line)
-- **Risk if not addressed:** (one line)
+⚠️ Current Status & Risk
+Status: {status_icon}
+- What this means for your crop: (one line)
+- Why it may have changed: (one line)
+- Risk if not addressed: (one line)
 ---
-### ✅ Recommended Action
-1. **[Action]** — [what, product, dose/acre, when]
+✅ Recommended Action
+1. [Action] — [what, product, dose/acre, when]
 2. ...
 3. ...
 ---
-### 📅 Watch Points
-- **Next check date:** [specific date 15–20 days from now]
-- **Warning sign to watch for:** [one observable field sign]
-- **Target value to reach:** [specific number with unit]
+📅 Watch Points
+- Next check date: [specific date 15–20 days from now]
+- Warning sign to watch for: [one observable field sign]
+- Target value to reach: [specific number with unit]
 ---
-*Based on {n_passes} Sentinel-2 passes · ICAR standards · FarmMatrix*
+Based on {n_passes} Sentinel-2 passes · ICAR standards · FarmMatrix
 RULES:
 - Focus ONLY on {selected_param}
 - Use only locally available Indian inputs
@@ -610,7 +643,7 @@ def call_groq(prompt: str) -> str | None:
 # ─────────────────────────────────────────────────────────────────────────────
 #  FASTAPI APP
 # ─────────────────────────────────────────────────────────────────────────────
-app = FastAPI(title="FarmMatrix API", version="2.0.0")
+app = FastAPI(title="FarmMatrix API", version="3.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -622,29 +655,37 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-# ── Pydantic models ────────────────────────────────────────────────────────
-class AnalyseFullRequest(BaseModel):
+# ── Shared request model ─────────────────────────────────────────────────────
+class AnalyseRequest(BaseModel):
     """
-    Single unified request model.
-    All fields required except selected_param (defaults to 'Soil Health Score')
-    and location (defaults to 'Unknown Location').
+    Used by BOTH /api/analyse  and  /api/chart — same body, different response.
+    coordinates   : GeoJSON polygon ring — list of [longitude, latitude] pairs.
+                    First and last point must be identical (closed ring).
+                    Example: [[73.85,18.52],[73.86,18.52],[73.86,18.53],
+                               [73.85,18.53],[73.85,18.52]]
+    start_date    : "YYYY-MM-DD"
+    end_date      : "YYYY-MM-DD"
+    selected_param: One of:
+                    "Soil Health Score" | "pH" | "Salinity" | "Organic Carbon" |
+                    "CEC" | "LST" | "NDVI" | "EVI" | "FVC" | "NDWI" |
+                    "Nitrogen" | "Phosphorus" | "Potassium" |
+                    "Calcium" | "Magnesium" | "Sulphur"
+    location      : Human-readable farm/location name (appears in AI advisory).
     """
-    coordinates: List[List[Any]]       # GeoJSON polygon ring: [[lng, lat], ...]
-    start_date: str                     # "YYYY-MM-DD"
-    end_date: str                       # "YYYY-MM-DD"
-    selected_param: str = "Soil Health Score"   # parameter for chart + AI insight
-    location: str = "Unknown Location"  # human-readable name shown in AI advisory
-    include_chart: bool = True          # set False to skip chart generation (faster)
-    include_insight: bool = True        # set False to skip AI advisory (faster)
+    coordinates:    List[List[Any]]
+    start_date:     str
+    end_date:       str
+    selected_param: str = "Soil Health Score"
+    location:       str = "Unknown Location"
 
 
 # ── Health check ─────────────────────────────────────────────────────────────
 @app.get("/health")
-async def health():
-    return {"status": "ok", "service": "FarmMatrix"}
+async def health_check():
+    return {"status": "ok", "service": "FarmMatrix", "version": "3.0.0"}
 
 
-# ── Serve frontend ────────────────────────────────────────────────────────────
+# ── Frontend ──────────────────────────────────────────────────────────────────
 @app.get("/", response_class=HTMLResponse)
 async def index():
     html_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
@@ -652,68 +693,37 @@ async def index():
         return HTMLResponse(content=f.read())
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  SINGLE UNIFIED ENDPOINT
-# ─────────────────────────────────────────────────────────────────────────────
+# ═════════════════════════════════════════════════════════════════════════════
+#  ENDPOINT 1 — /api/analyse
+#  Response: JSON  (meta + summary + time_series + ai_insight)
+#  NO image in this response.
+# ═════════════════════════════════════════════════════════════════════════════
 @app.post("/api/analyse")
-async def api_analyse(req: AnalyseFullRequest):
+async def api_analyse(req: AnalyseRequest):
     """
-    Full pipeline in one call:
-      1. Discover all Sentinel-2 satellite pass dates in the date range
-      2. Fetch soil/vegetation snapshot for every pass
-      3. Compute per-pass health scores + latest-pass summary
-      4. Generate chart (base64 PNG) for selected_param
-      5. Generate AI advisory for selected_param
-
-    Returns a single JSON with all results.
-
-    Typical wall-clock time: 2–8 minutes depending on date range and farm size.
+    Runs the full satellite data pipeline and returns structured JSON:
+    {
+      "meta":        { location, period, n_passes, pass_dates, selected_param },
+      "summary":     { health_score, rating, params: { <param>: {value, status, unit, label} } },
+      "time_series": { records: [...], pass_scores: [{date, health_score}] },
+      "ai_insight":  { text, param, model }
+    }
+    Does NOT include a chart image — call /api/chart for the PNG.
+    Typical response time: 2–8 min.
     """
     loop = asyncio.get_event_loop()
 
-    # ── 1. Parse inputs ──────────────────────────────────────────────────────
-    try:
-        start  = datetime.strptime(req.start_date, "%Y-%m-%d").date()
-        end    = datetime.strptime(req.end_date,   "%Y-%m-%d").date()
-        region = ee.Geometry.Polygon(req.coordinates)
-    except Exception as exc:
-        raise HTTPException(status_code=422, detail=f"Invalid input: {exc}")
-
-    period = f"{req.start_date} to {req.end_date}"
-
-    # ── 2. Discover satellite pass dates ─────────────────────────────────────
-    visit_dates: list[date] = await loop.run_in_executor(
-        None, get_all_visit_dates, region, start, end
+    _, visit_dates, df = await _build_dataframe(
+        req.coordinates, req.start_date, req.end_date
     )
-
-    if not visit_dates:
-        raise HTTPException(
-            status_code=404,
-            detail="No Sentinel-2 passes found for this region and date range. "
-                   "Try a wider date range or check coordinates."
-        )
-
     n_passes = len(visit_dates)
+    period   = f"{req.start_date} to {req.end_date}"
 
-    # ── 3. Fetch snapshot for each pass ──────────────────────────────────────
-    records: list[dict] = []
-    for day in visit_dates:
-        snap = await loop.run_in_executor(None, fetch_snapshot, region, day)
-        records.append({
-            "date": day.strftime("%Y-%m-%d"),
-            **(snap if snap else {p: None for p in IDEAL_RANGES})
-        })
-
-    # ── 4. Build DataFrame ───────────────────────────────────────────────────
-    df = pd.DataFrame(records)
-    df["date"] = pd.to_datetime(df["date"])
-    df = df.sort_values("date").reset_index(drop=True)
-
-    # ── 5. Compute summary (latest pass) ────────────────────────────────────
-    last_row = df.dropna(subset=list(IDEAL_RANGES.keys()), how="all").iloc[-1]
+    # Latest-pass summary
+    last_row    = df.dropna(subset=list(IDEAL_RANGES.keys()), how="all").iloc[-1]
     snap_latest = {p: last_row.get(p) for p in IDEAL_RANGES}
-    hs = health_score(snap_latest)
-    rating = ("Excellent" if hs >= 80 else "Good" if hs >= 60 else "Fair" if hs >= 40 else "Poor")
+    hs          = health_score(snap_latest)
+    rating      = ("Excellent" if hs >= 80 else "Good" if hs >= 60 else "Fair" if hs >= 40 else "Poor")
 
     params_summary: dict = {}
     for p in IDEAL_RANGES:
@@ -725,8 +735,8 @@ async def api_analyse(req: AnalyseFullRequest):
             "label":  FULL_NAME.get(p, p),
         }
 
-    # ── 6. Per-pass health scores ────────────────────────────────────────────
-    pass_scores: list[dict] = []
+    # Per-pass health scores
+    pass_scores = []
     for _, row in df.iterrows():
         s = {p: row.get(p) for p in IDEAL_RANGES}
         pass_scores.append({
@@ -734,24 +744,22 @@ async def api_analyse(req: AnalyseFullRequest):
             "health_score": round(health_score(s), 1),
         })
 
-    # ── 7. Chart ─────────────────────────────────────────────────────────────
-    chart_b64: str | None = None
-    if req.include_chart:
-        if req.selected_param == "Soil Health Score":
-            chart_b64 = await loop.run_in_executor(None, chart_health_score, df)
-        else:
-            chart_b64 = await loop.run_in_executor(None, chart_single_param, df, req.selected_param)
+    # AI advisory
+    prompt     = build_focused_prompt(df, req.location, period, n_passes, req.selected_param)
+    ai_insight = None
+    if prompt:
+        ai_insight = await loop.run_in_executor(None, call_groq, prompt)
 
-    # ── 8. AI advisory ───────────────────────────────────────────────────────
-    ai_insight: str | None = None
-    if req.include_insight:
-        prompt = build_focused_prompt(df, req.location, period, n_passes, req.selected_param)
-        if prompt:
-            ai_insight = await loop.run_in_executor(None, call_groq, prompt)
+    # Serialise records (dates → strings)
+    records_out = []
+    for _, row in df.iterrows():
+        r = {"date": row["date"].strftime("%Y-%m-%d")}
+        for p in IDEAL_RANGES:
+            v = row.get(p)
+            r[p] = round(float(v), 4) if _is_valid(v) else None
+        records_out.append(r)
 
-    # ── 9. Build and return full response ────────────────────────────────────
     return {
-        # ── Meta ──────────────────────────────────────────────────────────
         "meta": {
             "location":       req.location,
             "period":         period,
@@ -759,37 +767,70 @@ async def api_analyse(req: AnalyseFullRequest):
             "pass_dates":     [d.strftime("%Y-%m-%d") for d in visit_dates],
             "selected_param": req.selected_param,
         },
-
-        # ── Latest-pass summary ───────────────────────────────────────────
         "summary": {
             "health_score": round(hs, 1),
             "rating":       rating,
             "params":       params_summary,
         },
-
-        # ── Full time-series (one row per pass) ───────────────────────────
         "time_series": {
-            "records":      [
-                {**r, "date": pd.Timestamp(r["date"]).strftime("%Y-%m-%d")}
-                for r in records
-            ],
-            "pass_scores":  pass_scores,
+            "records":     records_out,
+            "pass_scores": pass_scores,
         },
-
-        # ── Chart (base64 PNG, null if include_chart=false) ───────────────
-        "chart": {
-            "image":        chart_b64,          # decode as PNG or embed in <img src="data:image/png;base64,...">
-            "mime":         "image/png",
-            "param":        req.selected_param,
-        },
-
-        # ── AI advisory (null if include_insight=false) ───────────────────
         "ai_insight": {
-            "text":         ai_insight,
-            "param":        req.selected_param,
-            "model":        GROQ_MODEL,
+            "text":  ai_insight,
+            "param": req.selected_param,
+            "model": GROQ_MODEL,
         },
     }
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+#  ENDPOINT 2 — /api/chart
+#  Response: raw PNG image (Content-Type: image/png)
+#  NO JSON in this response.
+# ═════════════════════════════════════════════════════════════════════════════
+@app.post("/api/chart")
+async def api_chart(req: AnalyseRequest):
+    """
+    Runs the same satellite data pipeline, then renders and returns a PNG chart
+    directly as the response body (Content-Type: image/png).
+    • In Postman: go to the response area → click "Visualize" tab to see the image,
+      or save it via "Save Response → Save to a file".
+    • In a browser / frontend: use as <img src="..."> after fetching.
+    selected_param = "Soil Health Score"  → overall health-score-over-time chart
+    selected_param = any other param      → that parameter's time-series chart
+    Typical response time: 2–8 min.
+    """
+    loop = asyncio.get_event_loop()
+
+    _, visit_dates, df = await _build_dataframe(
+        req.coordinates, req.start_date, req.end_date
+    )
+
+    # Render PNG
+    if req.selected_param == "Soil Health Score":
+        png_bytes = await loop.run_in_executor(None, render_health_score_chart, df)
+    else:
+        png_bytes = await loop.run_in_executor(None, render_param_chart, df, req.selected_param)
+
+    if not png_bytes:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No chart data available for parameter '{req.selected_param}'."
+        )
+
+    filename = f"farmmatrix_{req.selected_param.replace(' ', '_')}.png"
+    return Response(
+        content=png_bytes,
+        media_type="image/png",
+        headers={
+            # inline → Postman Visualize tab shows it; attachment → triggers download
+            "Content-Disposition": f'inline; filename="{filename}"',
+            "X-FarmMatrix-Param":  req.selected_param,
+            "X-FarmMatrix-Passes": str(len(visit_dates)),
+            "X-FarmMatrix-Period": f"{req.start_date} to {req.end_date}",
+        },
+    )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
