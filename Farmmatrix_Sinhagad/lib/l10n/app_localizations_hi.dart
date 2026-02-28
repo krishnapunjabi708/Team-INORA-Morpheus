@@ -791,4 +791,46 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get custom => 'कस्टम';
+
+  @override
+  String get bookAppointmentTitle => 'अपॉइंटमेंट बुक करें';
+
+  @override
+  String get bookAppointmentDescription => 'आपके पास अपनी मिट्टी के नमूने हैं? हमसे संपर्क करें और परीक्षण करवाएं';
+
+  @override
+  String get scheduleNow => 'अभी शेड्यूल करें';
+
+  @override
+  String get submitSoilSamples => 'अपने मिट्टी के नमूने जमा करें और परीक्षण करवाएं';
+
+  @override
+  String get contact => 'संपर्क';
+
+  @override
+  String get noOfSamples => 'नमूनों की संख्या';
+
+  @override
+  String get visitingTime => 'आगमन का समय';
+
+  @override
+  String get selectDateTime => 'तारीख और समय चुनें';
+
+  @override
+  String get address => 'पता';
+
+  @override
+  String get thisFieldIsRequired => 'यह फ़ील्ड आवश्यक है';
+
+  @override
+  String get pleaseSelectVisitingTime => 'कृपया आगमन का समय चुनें';
+
+  @override
+  String get bookAppointment => 'अपॉइंटमेंट बुक करें';
+
+  @override
+  String get appointmentBooked => 'आपका अपॉइंटमेंट बुक हो गया है';
+
+  @override
+  String get failedToBook => 'अपॉइंटमेंट बुक करने में असफल';
 }

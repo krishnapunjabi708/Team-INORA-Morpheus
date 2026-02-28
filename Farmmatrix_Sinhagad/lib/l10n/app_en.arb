@@ -244,6 +244,21 @@
 "selectDateRange": "Select Date Range",
 "lastMonth": "Last month",
 "custom": "Custom",
+"bookAppointmentTitle": "Book Appointment",
+"bookAppointmentDescription": "Have your own soil samples? Reach out to us and get it tested",
+"scheduleNow": "Schedule now",
+"submitSoilSamples": "Submit your soil samples and get it tested",
+  "fullName": "Full Name",
+  "contact": "Contact",
+  "noOfSamples": "No. of Samples",
+  "visitingTime": "Visiting Time",
+  "selectDateTime": "Select Date & Time",
+  "address": "Address",
+  "thisFieldIsRequired": "This field is required",
+  "pleaseSelectVisitingTime": "Please select visiting time",
+  "bookAppointment": "Book Appointment",
+  "appointmentBooked": "Your appointment is booked",
+  "failedToBook": "Failed to book appointment",
   "@welcomeUser": {
     "placeholders": {
       "name": {}

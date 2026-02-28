@@ -1560,6 +1560,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Custom'**
   String get custom;
+
+  /// No description provided for @bookAppointmentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Appointment'**
+  String get bookAppointmentTitle;
+
+  /// No description provided for @bookAppointmentDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Have your own soil samples? Reach out to us and get it tested'**
+  String get bookAppointmentDescription;
+
+  /// No description provided for @scheduleNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule now'**
+  String get scheduleNow;
+
+  /// No description provided for @submitSoilSamples.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit your soil samples and get it tested'**
+  String get submitSoilSamples;
+
+  /// No description provided for @contact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get contact;
+
+  /// No description provided for @noOfSamples.
+  ///
+  /// In en, this message translates to:
+  /// **'No. of Samples'**
+  String get noOfSamples;
+
+  /// No description provided for @visitingTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Visiting Time'**
+  String get visitingTime;
+
+  /// No description provided for @selectDateTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Date & Time'**
+  String get selectDateTime;
+
+  /// No description provided for @address.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get address;
+
+  /// No description provided for @thisFieldIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get thisFieldIsRequired;
+
+  /// No description provided for @pleaseSelectVisitingTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select visiting time'**
+  String get pleaseSelectVisitingTime;
+
+  /// No description provided for @bookAppointment.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Appointment'**
+  String get bookAppointment;
+
+  /// No description provided for @appointmentBooked.
+  ///
+  /// In en, this message translates to:
+  /// **'Your appointment is booked'**
+  String get appointmentBooked;
+
+  /// No description provided for @failedToBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to book appointment'**
+  String get failedToBook;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

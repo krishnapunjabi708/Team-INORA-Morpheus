@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:farmmatrix/screens/book_appointment/book_appointment.dart';
 import 'package:farmmatrix/screens/chatbot/chatbot_screen.dart';
 import 'package:farmmatrix/screens/health_history/soil_health_history.dart';
 import 'package:farmmatrix/screens/soil_report/soil_report_screen.dart';
@@ -490,6 +491,23 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           );
                         }
+                      },
+                    ),
+
+                    const SizedBox(height: 24),
+                    FeatureCard(
+                      bgImagePath: 'assets/images/book_appointment.png',
+                      iconPath: 'assets/images/book_appoint.png',
+                      title: loc.bookAppointmentTitle,
+                      description: loc.bookAppointmentDescription,
+                      buttonLabel: loc.scheduleNow,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const BookAppointmentScreen(),
+                          ),
+                        );
                       },
                     ),
                   ],

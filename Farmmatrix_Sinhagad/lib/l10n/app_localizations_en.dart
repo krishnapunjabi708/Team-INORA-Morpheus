@@ -791,4 +791,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get custom => 'Custom';
+
+  @override
+  String get bookAppointmentTitle => 'Book Appointment';
+
+  @override
+  String get bookAppointmentDescription => 'Have your own soil samples? Reach out to us and get it tested';
+
+  @override
+  String get scheduleNow => 'Schedule now';
+
+  @override
+  String get submitSoilSamples => 'Submit your soil samples and get it tested';
+
+  @override
+  String get contact => 'Contact';
+
+  @override
+  String get noOfSamples => 'No. of Samples';
+
+  @override
+  String get visitingTime => 'Visiting Time';
+
+  @override
+  String get selectDateTime => 'Select Date & Time';
+
+  @override
+  String get address => 'Address';
+
+  @override
+  String get thisFieldIsRequired => 'This field is required';
+
+  @override
+  String get pleaseSelectVisitingTime => 'Please select visiting time';
+
+  @override
+  String get bookAppointment => 'Book Appointment';
+
+  @override
+  String get appointmentBooked => 'Your appointment is booked';
+
+  @override
+  String get failedToBook => 'Failed to book appointment';
 }

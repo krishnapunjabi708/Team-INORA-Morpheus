@@ -245,6 +245,21 @@
 "selectDateRange": "दिनांक कालावधी निवडा",
 "lastMonth": "मागील महिना",
 "custom": "कस्टम",
+"bookAppointmentTitle": "अपॉइंटमेंट बुक करें",
+"bookAppointmentDescription": "तुमच्याकडे स्वतःचे माती नमुने आहेत? आमच्याशी संपर्क साधा आणि चाचणी करून घ्या",
+"scheduleNow": "आता शेड्यूल करा",
+"submitSoilSamples": "अपने मिट्टी के नमूने जमा करें और परीक्षण करवाएं",
+  "fullName": "पूरा नाम",
+  "contact": "संपर्क",
+  "noOfSamples": "नमूनों की संख्या",
+  "visitingTime": "आगमन का समय",
+  "selectDateTime": "तारीख और समय चुनें",
+  "address": "पता",
+  "thisFieldIsRequired": "यह फ़ील्ड आवश्यक है",
+  "pleaseSelectVisitingTime": "कृपया आगमन का समय चुनें",
+  "bookAppointment": "अपॉइंटमेंट बुक करें",
+  "appointmentBooked": "आपका अपॉइंटमेंट बुक हो गया है",
+  "failedToBook": "अपॉइंटमेंट बुक करने में असफल",
   "@welcomeUser": {
     "placeholders": {
       "name": {}

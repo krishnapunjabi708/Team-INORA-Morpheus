@@ -6,6 +6,7 @@ import 'package:farmmatrix/services/user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:farmmatrix/screens/home/home_screen.dart';
 import 'package:farmmatrix/l10n/app_localizations.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ChatbotScreen extends StatefulWidget {
   final String? chatId;
@@ -39,7 +40,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   @override
   void initState() {
     super.initState();
-    _currentChatId = widget.chatId ?? DateTime.now().millisecondsSinceEpoch.toString();
+    _currentChatId =
+        widget.chatId ?? DateTime.now().millisecondsSinceEpoch.toString();
     _loadChatHistory();
     _loadMessages();
   }
@@ -48,9 +50,10 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     final prefs = await SharedPreferences.getInstance();
     final historyJson = prefs.getStringList('chat_history') ?? [];
     setState(() {
-      _chatHistory = historyJson
-          .map((json) => ChatHistory.fromJson(jsonDecode(json)))
-          .toList();
+      _chatHistory =
+          historyJson
+              .map((json) => ChatHistory.fromJson(jsonDecode(json)))
+              .toList();
     });
   }
 
@@ -60,11 +63,12 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     final prefs = await SharedPreferences.getInstance();
     final messagesJson = prefs.getStringList('chat_${widget.chatId}') ?? [];
     setState(() {
-      _messages = messagesJson
-          .map((json) => ChatMessage.fromJson(jsonDecode(json)))
-          .toList()
-          .reversed
-          .toList();
+      _messages =
+          messagesJson
+              .map((json) => ChatMessage.fromJson(jsonDecode(json)))
+              .toList()
+              .reversed
+              .toList();
     });
   }
 
@@ -77,13 +81,13 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
     final historyEntry = ChatHistory(
       id: _currentChatId,
-      title: _messages.isNotEmpty
-          ? _messages.last.text
-          : loc.newChat,
+      title: _messages.isNotEmpty ? _messages.last.text : loc.newChat,
       lastMessageTime: DateTime.now(),
     );
 
-    final existingIndex = _chatHistory.indexWhere((chat) => chat.id == _currentChatId);
+    final existingIndex = _chatHistory.indexWhere(
+      (chat) => chat.id == _currentChatId,
+    );
     if (existingIndex >= 0) {
       _chatHistory[existingIndex] = historyEntry;
     } else {
@@ -250,7 +254,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
       key: _scaffoldKey,
       appBar: AppBar(
         title: Text(loc.farmMatrixAssistant),
-        backgroundColor: const Color(0xFF178D38),
+        backgroundColor: const Color(0xFF1B413C),
         foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -283,23 +287,24 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         color: Colors.grey[100],
-                        child: _messages.isEmpty
-                            ? Center(
-                                child: Text(
-                                  loc.askYourAssistant,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.grey,
+                        child:
+                            _messages.isEmpty
+                                ? Center(
+                                  child: Text(
+                                    loc.askYourAssistant,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.grey,
+                                    ),
                                   ),
+                                )
+                                : ListView.builder(
+                                  reverse: true,
+                                  itemCount: _messages.length,
+                                  itemBuilder: (context, index) {
+                                    return _messages[index];
+                                  },
                                 ),
-                              )
-                            : ListView.builder(
-                                reverse: true,
-                                itemCount: _messages.length,
-                                itemBuilder: (context, index) {
-                                  return _messages[index];
-                                },
-                              ),
                       ),
                     ),
                     _buildInputUI(),
@@ -448,8 +453,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
       final requestBody = {"question": message, "username": userName};
 
+      final apiUrl = dotenv.env['CHATBOT_API'];
+
+      if (apiUrl == null || apiUrl.isEmpty) {
+        throw Exception("CHATBOT_API not found in .env");
+      }
+
       final response = await http.post(
-        Uri.parse('https://rituja04-farmmatrix-chatbot-api.hf.space/generate'),
+        Uri.parse(apiUrl),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestBody),
       );
@@ -543,7 +554,8 @@ class ChatMessage extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           if (!isUser && !isLoading) _buildBotAvatar(),
           if (isLoading) _buildBotAvatar(),
@@ -589,13 +601,16 @@ class ChatMessage extends StatelessWidget {
           bottomRight: Radius.circular(isUser ? 0 : 12),
         ),
       ),
-      child: isLoading ? _buildLoadingIndicator() : Text(
-        text,
-        style: TextStyle(
-          color: isUser ? Colors.white : Colors.black,
-          fontSize: 16,
-        ),
-      ),
+      child:
+          isLoading
+              ? _buildLoadingIndicator()
+              : Text(
+                text,
+                style: TextStyle(
+                  color: isUser ? Colors.white : Colors.black,
+                  fontSize: 16,
+                ),
+              ),
     );
   }
 
