@@ -4,8 +4,10 @@ import 'package:farmmatrix/screens/chatbot/chatbot_screen.dart';
 import 'package:farmmatrix/screens/health_history/soil_health_history.dart';
 import 'package:farmmatrix/screens/mapped_field/field_map_screen.dart';
 import 'package:farmmatrix/screens/soil_report/soil_report_screen.dart';
+import 'package:farmmatrix/screens/voice_assistant/voice_assistant_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:farmmatrix/config/app_config.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:farmmatrix/screens/dashboard/dashboard.dart';
@@ -562,24 +564,79 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      floatingActionButton: FloatingActionButton(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        highlightElevation: 0,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const ChatbotScreen()),
-          );
-        },
-        child: Transform.scale(
-          scale: 1.5,
-          child: Image.asset(
-            'assets/images/chatbot.png',
-            width: 60,
-            height: 60,
-          ),
+      // floatingActionButton: FloatingActionButton(
+      //   elevation: 0,
+      //   backgroundColor: Colors.transparent,
+      //   highlightElevation: 0,
+      //   onPressed: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (_) => const ChatbotScreen()),
+      //     );
+      //   },
+      //   child: Transform.scale(
+      //     scale: 1.5,
+      //     child: Image.asset(
+      //       'assets/images/chatbot.png',
+      //       width: 60,
+      //       height: 60,
+      //     ),
+      //   ),
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: SpeedDial(
+        icon: Icons.add,
+        activeIcon: Icons.close,
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF1B413C),
+        activeBackgroundColor: Colors.white,
+        activeForegroundColor: const Color(0xFF1B413C),
+        buttonSize: const Size(65, 65),
+        visible: true,
+        closeManually: false,
+        curve: Curves.bounceIn,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.4,
+        elevation: 8.0,
+        shape: const CircleBorder(
+          side: BorderSide(color: Color(0xFF1B413C), width: 2.5),
         ),
+        children: [
+          // Voice Assistant (using voice.png, no bg)
+          SpeedDialChild(
+            child: Image.asset(
+              'assets/images/voice.png',
+              width: 40,
+              height: 40,
+            ),
+            // No backgroundColor here → image appears directly
+            label: 'Voice Assistant',
+            labelStyle: const TextStyle(fontSize: 14),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const VoiceAssistantScreen()),
+              );
+            },
+          ),
+          // Chatbot (using chatbot.png, no bg)
+          SpeedDialChild(
+            child: Image.asset(
+              'assets/images/chatbot.png',
+              width: 40,
+              height: 40,
+            ),
+            // No backgroundColor here → image appears directly
+            label: 'Chat with AI',
+            labelStyle: const TextStyle(fontSize: 14),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ChatbotScreen()),
+              );
+            },
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
